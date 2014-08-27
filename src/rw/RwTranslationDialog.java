@@ -13,6 +13,7 @@ package rw;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.font.TextAttribute;
 import java.awt.print.PrinterException;
 import javax.swing.JTextPane;
 import javax.swing.text.MutableAttributeSet;
@@ -29,15 +30,16 @@ import javax.swing.JOptionPane;
 public class RwTranslationDialog extends javax.swing.JDialog {
 
     /** Creates new form RwTranslationDialog */
-    public RwTranslationDialog(java.awt.Frame parent, boolean modal) {
+    public RwTranslationDialog(java.awt.Frame parent, boolean modal, String directionality) {
         super(parent, modal);
+        this.directionality = directionality;
         initComponents();
         setLocationRelativeTo(parent);
         originalTextPane.setText("None Yet...");
         translationTextPane.setText("None Yet...");
         this.parent = (RandomWords)parent;
         contractions.put("aren\'t", "are not");
-        contractions.put("can\'t","cannot");
+        contractions.put("can\'t","can not");
         contractions.put("couldn't","could not");
         contractions.put("didn't","did not");
         contractions.put("don\'t","do not");
@@ -319,13 +321,21 @@ public class RwTranslationDialog extends javax.swing.JDialog {
                 pronunciation.append(u3);
                 rwe = dictionary.findFromDefinition(u[1]);
                 System.out.print(rwe.getDefinition() + " ");
-                translated.append(rwe.getWrittenForm());
+                String wf=rwe.getWrittenForm();
+                /*if(directionality.equals("rtl")){
+                    wf= new StringBuffer(wf).reverse().toString();
+                }*/
+                translated.append(wf + " ");
                 pronunciation.append(rwe.getMeaning());
                 continue;
             }
             rwe = dictionary.findFromDefinition(s);
             System.out.print(rwe.getDefinition() + " ");
-            translated.append(rwe.getWrittenForm());
+            String wf = rwe.getWrittenForm();
+            /*if(directionality.equals("rtl")){
+                wf= new StringBuffer(wf).reverse().toString();
+            }*/
+            translated.append(wf);
             pronunciation.append(rwe.getMeaning());
             if (t.length() == 1){
                 translated.append(punctuationMap.get(" "));
@@ -342,6 +352,12 @@ public class RwTranslationDialog extends javax.swing.JDialog {
             }
             translated.append((punctuationMap.get(" ")+""));
             pronunciation.append(" ");
+        }
+        if(directionality.equals("rtl")){
+            translationTextPane.getDocument().putProperty(TextAttribute.RUN_DIRECTION,TextAttribute.RUN_DIRECTION_RTL);
+            translated.reverse();
+        } else {
+            translationTextPane.getDocument().putProperty(TextAttribute.RUN_DIRECTION,TextAttribute.RUN_DIRECTION_LTR);
         }
         translationTextPane.setText(translated.toString().trim());
         jTextPane1.setText(pronunciation.toString());
@@ -382,14 +398,31 @@ public class RwTranslationDialog extends javax.swing.JDialog {
             if(contractions.containsKey(t)){
                 String[] u = ((String)contractions.get(t)).split(" ");
                 rwe = dictionary.findFromDefinition(u[0]);
-                String u2= rwe.getWrittenForm() + (punctuationMap.get(" ")+"");
-                translated.append(u2);
+                String u2= rwe.getTransliteration();
+                if (directionality.equals("rtl")){
+                    u2 = new StringBuffer(u2).reverse().toString();
+                    translated.append(u2 + punctuationMap.get(" "));
+                } else {
+                    translated.append(u2 + punctuationMap.get(" "));
+                }
                 rwe = dictionary.findFromDefinition(u[1]);
-                translated.append(rwe.getTransliteration());
+                u2 = rwe.getTransliteration();
+                if (directionality.equals("rtl")){
+                    u2 = new StringBuffer(u2).reverse().toString();
+                    translated.append(u2 + punctuationMap.get(" "));
+                } else {
+                    translated.append(u2 + punctuationMap.get(" "));
+                }
                 continue;
             }
             rwe = dictionary.findFromDefinition(s);
-            translated.append(rwe.getTransliteration());
+            String wf = rwe.getTransliteration();
+            if(directionality.equals("rtl")){
+                wf = new StringBuffer(wf).reverse().toString();
+                translated.append(wf + punctuationMap.get(" "));
+            } else {
+                translated.append(wf);
+            }
             if (t.length() == 1){
                 translated.append(punctuationMap.get(" "));
                 continue;
@@ -403,122 +436,14 @@ public class RwTranslationDialog extends javax.swing.JDialog {
             }
             translated.append((punctuationMap.get(" ")+""));
         }
+        if(directionality.equals("rtl")){
+            translationTextPane.getDocument().putProperty(TextAttribute.RUN_DIRECTION,TextAttribute.RUN_DIRECTION_RTL);
+            //translated.reverse();
+        } else {
+            translationTextPane.getDocument().putProperty(TextAttribute.RUN_DIRECTION,TextAttribute.RUN_DIRECTION_LTR);
+        }
         translationTextPane.setText(translated.toString().trim());
-        /*HashMap phonemes = (HashMap)((RandomWords)parent).getWritingSystem().get("Phonemes");
-        HashMap glyphUses = (HashMap)((RandomWords)parent).getWritingSystem().get("GlyphUseMap");
-        HashMap punct = (HashMap)((RandomWords)parent).getWritingSystem().get("Punctuation");
-        int glyphsPerLetter = 0;
-        if(((HashMap)((RandomWords)parent).getWritingSystem()).containsKey("GlyphsPerLetter")){
-            glyphsPerLetter = Integer.parseInt(((RandomWords)parent).getWritingSystem().get("GlyphsPerLetter") + "");
-        }
-        if(((RandomWords)parent).getWritingSystem().get("System").equals("Alphabet")){
-            String orig = originalTextPane.getText();
-            String trans = "";
-            int ucaseVal = 0;
-            int lcaseVal = 0;
-            int initVal = 0;
-            int medVal = 0;
-            int finVal = 0;
-            int isoVal = 0;
-            for (int q = 0; q < glyphsPerLetter; q++) {
-                if (glyphUses.get("Glyph_" + (q + 1)).equals("Upper")) {
-                    ucaseVal = q;
-                }
-                if (glyphUses.get("Glyph_" + (q + 1)).equals("Lower")) {
-                    lcaseVal = q;
-                }
-                if (glyphUses.get("Glyph_" + (q + 1)).equals("Initial")) {
-                    initVal = q;
-                }
-                if (glyphUses.get("Glyph_" + (q + 1)).equals("Medial")) {
-                    medVal = q;
-                }
-                if (glyphUses.get("Glyph_" + (q + 1)).equals("Final")) {
-                    finVal = q;
-                }
-                if (glyphsPerLetter > 3
-                        && glyphUses.get("Glyph_" + (q + 1)).equals("Isolated")) {
-                    isoVal = q;
-                }
-            }
-            char key;
-            boolean initial = true;
-            String peekAhead = "";
-            for (int a = 0; a < orig.length(); a ++){
-                key = orig.charAt(a);
-                String skey = (key+"").toLowerCase();
-                if((a+1)<orig.length()){
-                    peekAhead=orig.charAt(a+1)+"";
-                }
-                String[] lets = ((StringBuilder)phonemes.get(skey)+"").split(" ");
-                if(isPunctuation(key)){
-                    trans += punct.get(key+"");
-                } else if(Character.isUpperCase(key) && glyphUses.containsValue("Upper")){
-                    trans += lets[ucaseVal];
-                } else if (Character.isLowerCase(key) && glyphUses.containsValue("Lower")){
-                    trans += lets[lcaseVal];
-                } else if (initial && (peekAhead.equals(" ") || isPunctuation(peekAhead.charAt(0)) || a == orig.length())){
-                    trans += lets[isoVal];
-                    initial = true;
-                } else if (initial){
-                    initial = false;
-                    trans += lets[initVal];
-                } else if (peekAhead.equals(" ") || isPunctuation(peekAhead.charAt(0)) || a == orig.length()){
-                    trans += lets[finVal];
-                    initial = true;
-                } else {
-                    trans += lets[medVal];
-                }
-            }
-            translationTextPane.setText(trans);
-        }
-        if(((RandomWords)parent).getWritingSystem().get("System").equals("Abjad")){
 
-        }
-        if(((RandomWords)parent).getWritingSystem().get("System").equals("Abugida")){
-            String orig = originalTextPane.getText();
-            StringBuilder trans = new StringBuilder();
-            for (int a = 0; a < orig.length(); a ++){
-                String key = orig.charAt(a)+"";
-                key=key.toLowerCase();
-                if(isPunctuation(key.charAt(0))){
-                    trans.append(punct.get(key));
-                } else {
-                    trans.append((phonemes.get(key)+"").trim());
-                }
-            }
-            translationTextPane.setText(trans.toString());
-        }
-        if(((RandomWords)parent).getWritingSystem().get("System").equals("Syllabary")){
-
-        }
-        if(((RandomWords)parent).getWritingSystem().get("System").equals("Multigraphic")){
-            String orig = originalTextPane.getText();
-            int gpg = Integer.parseInt(((RandomWords)parent).getWritingSystem().get("GraphemesPerGlyph") + "");
-            boolean enders = phonemes.containsKey("Enders");
-            int grapheme = 0;
-            StringBuilder trans = new StringBuilder();
-            for (int a = 0; a < orig.length(); a++){
-                String key = (orig.charAt(a)+"").toLowerCase();
-                if(isPunctuation(key.charAt(0))){
-                    if(grapheme < gpg - 1 && enders){
-                        System.out.print(grapheme);
-                        String[] g = (phonemes.get("Enders")+"").split(" ");
-                        trans.append(g[(gpg-1)-grapheme]);
-                    }
-                    trans.append(punct.get(key));
-                    grapheme = 0;
-                } else {
-                    String[] glyph = (phonemes.get(key)+"").split(" ");
-                    trans.append(glyph[grapheme]);
-                    grapheme++;
-                    if(grapheme >= gpg){
-                        grapheme = 0;
-                    }
-                }
-            }
-            translationTextPane.setText(trans.toString());
-        }*/
     }//GEN-LAST:event_transliterateButtonActionPerformed
 
     private void PrintButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PrintButtonActionPerformed
@@ -555,7 +480,7 @@ public class RwTranslationDialog extends javax.swing.JDialog {
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                RwTranslationDialog dialog = new RwTranslationDialog(new javax.swing.JFrame(), true);
+                RwTranslationDialog dialog = new RwTranslationDialog(new javax.swing.JFrame(), true ,"ltr");
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);
@@ -617,4 +542,5 @@ public class RwTranslationDialog extends javax.swing.JDialog {
     // End of variables declaration//GEN-END:variables
     private RandomWords parent;
     private HashMap punctuationMap = new HashMap();
+    private String directionality = "ltr";
 }

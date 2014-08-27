@@ -43,7 +43,39 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
             Vector consonants, HashMap writingSystem){
         super(parent, title, modal);
         initComponents();
+        directionalityButton.setVisible(false);
+        abjadDirectionalityButton.setVisible(false);
+        abugidaDirectionalityButton.setVisible(false);
+        syllabaryDirectionalityButton.setVisible(false);
         setLocationRelativeTo(parent);
+        int pos = 1;
+        Vector vowls =  new Vector();
+        Vector consnts = new Vector();
+        for (int v=0;v<vowels.size();v++){
+            vowls.add(new String(vowels.elementAt(v)+""));
+        }
+        for (int v=0;v<consonants.size();v++){
+            consnts.add(new String(consonants.elementAt(v)+""));
+        }
+        String sound = vowels.elementAt(0)+"";
+        while(pos < vowls.size()){
+            if(vowls.elementAt(pos).equals(sound)){
+                vowls.remove(pos);
+            } else {
+                sound = vowls.elementAt(pos)+"";
+                pos ++;
+            }
+        }
+        pos = 1;
+        sound = consnts.elementAt(0)+"";
+        while(pos < consnts.size()){
+            if(consnts.elementAt(pos).equals(sound)){
+                consnts.remove(pos);
+            } else {
+                sound = consnts.elementAt(pos)+"";
+                pos ++;
+            }
+        }
         DefaultTableModel dtm4 = (DefaultTableModel)syllabaryTable.getModel();
         String fontname = (String)writingSystem.get("Font");
         Font defaultFont = new Font("LCS-ConstructorII",0,14);
@@ -54,21 +86,21 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
 
         dtm4.setColumnCount(0);
         dtm4.setRowCount(0);
-        Vector sconsonants = new Vector(consonants);
+        Vector sconsonants = new Vector(consnts);
         if (!sconsonants.contains("NC")){
             sconsonants.add("NC");
         }
         dtm4.addColumn(" ", sconsonants);
         vowelNumCombo.removeAllItems();
         consonantNumCombo.removeAllItems();
-        for(int a = 0; a<vowels.size(); a++){
-            dtm4.addColumn(vowels.elementAt(a));
-            vowelNumCombo.addItem(vowels.elementAt(a));
+        for(int a = 0; a<vowls.size(); a++){
+            dtm4.addColumn(vowls.elementAt(a));
+            vowelNumCombo.addItem(vowls.elementAt(a));
         }
         dtm4.addColumn("NV");
         vowelNumCombo.addItem("NV");
-        for(int a=0; a<consonants.size(); a++){
-            consonantNumCombo.addItem(consonants.elementAt(a));
+        for(int a=0; a<consnts.size(); a++){
+            consonantNumCombo.addItem(consnts.elementAt(a));
         }
         consonantNumCombo.addItem("NC");
         DefaultTableModel dtm=(DefaultTableModel)alphaTable.getModel();
@@ -82,8 +114,8 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
         dtm2.setRowCount(0);
         dtm3.setRowCount(0);
         Vector ds=new Vector();
-        ds.addAll(vowels);
-        ds.addAll(consonants);
+        ds.addAll(vowls);
+        ds.addAll(consnts);
         Object[] ob=ds.toArray();
         Arrays.sort(ob);
         dtm.setRowCount(ob.length);
@@ -91,6 +123,7 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
         dtm2.setRowCount(ob.length);
         dtm3.setRowCount(ob.length);
         HashMap phonemes = (HashMap)writingSystem.get("Phonemes");
+        System.out.println(phonemes+"");
         for(int a=0; a<ob.length; a++){
             dtm.setValueAt(ob[a], a, 0);
             dtm1.setValueAt(ob[a], a, 0);
@@ -211,8 +244,8 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
             HashMap syllables = (HashMap)writingSystem.get("Syllables");
             Object[] keys = syllables.keySet().toArray();
             Arrays.sort(keys);
-            Object[] vwls=vowels.toArray();
-            Object[] cnsnts=consonants.toArray();
+            Object[] vwls=vowls.toArray();
+            Object[] cnsnts=consnts.toArray();
             Arrays.sort(vwls, new LengthReverseComparator());
             Arrays.sort(cnsnts, new LengthReverseComparator());
             for(int s=0; s < keys.length; s++){
@@ -362,6 +395,7 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
         alphaJumpToField = new javax.swing.JTextField();
         alphaCurrentVLabel = new javax.swing.JLabel();
         autofillAlphabetButton = new javax.swing.JButton();
+        directionalityButton = new javax.swing.JToggleButton();
         abjadCard = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         borrowedAbjadFontRadio = new javax.swing.JRadioButton();
@@ -391,6 +425,7 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
         abjadCurrentVLabel = new javax.swing.JLabel();
         autofillAbjadButton = new javax.swing.JButton();
         abjadVowelCarrierCheck = new javax.swing.JCheckBox();
+        abjadDirectionalityButton = new javax.swing.JToggleButton();
         abugidaCard = new javax.swing.JPanel();
         abugidaFontLabel = new javax.swing.JLabel();
         abugidaBorrowedFontRadio = new javax.swing.JRadioButton();
@@ -414,6 +449,7 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
         abugidaAutoFillButton = new javax.swing.JButton();
         vowelCarrierCheck = new javax.swing.JCheckBox();
         noVowelCheckbox = new javax.swing.JCheckBox();
+        abugidaDirectionalityButton = new javax.swing.JToggleButton();
         syllabaryCard = new javax.swing.JPanel();
         syllabaryScroller = new javax.swing.JScrollPane();
         syllabaryTable = new javax.swing.JTable();
@@ -436,6 +472,7 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
         autoFillSyllabaryButton = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         visibleCharLabel = new javax.swing.JLabel();
+        syllabaryDirectionalityButton = new javax.swing.JToggleButton();
         multigraphicCard = new javax.swing.JPanel();
         multigraphicFontLabel = new javax.swing.JLabel();
         multiBorrowedRadio = new javax.swing.JRadioButton();
@@ -966,6 +1003,20 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
         gridBagConstraints.weighty = 0.1;
         alphabetCard.add(autofillAlphabetButton, gridBagConstraints);
 
+        directionalityButton.setFont(new java.awt.Font("LCS-ConstructorII", 0, 12)); // NOI18N
+        directionalityButton.setText("L ➡ R");
+        directionalityButton.setMargin(new java.awt.Insets(0, 2, 0, 2));
+        directionalityButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                directionalityButtonActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 60;
+        gridBagConstraints.insets = new java.awt.Insets(5, 10, 0, 0);
+        alphabetCard.add(directionalityButton, gridBagConstraints);
+
         writingSystemPane.addTab("Alphabet", alphabetCard);
 
         abjadCard.setMinimumSize(new java.awt.Dimension(610, 484));
@@ -1384,6 +1435,15 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
         gridBagConstraints.gridheight = 10;
         abjadCard.add(abjadVowelCarrierCheck, gridBagConstraints);
 
+        abjadDirectionalityButton.setFont(new java.awt.Font("LCS-ConstructorII", 0, 14));
+        abjadDirectionalityButton.setText("L ➡ R");
+        abjadDirectionalityButton.setMargin(new java.awt.Insets(0, 2, 0, 2));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 60;
+        gridBagConstraints.insets = new java.awt.Insets(5, 10, 0, 0);
+        abjadCard.add(abjadDirectionalityButton, gridBagConstraints);
+
         writingSystemPane.addTab("Abjad", abjadCard);
 
         abugidaCard.setMaximumSize(new java.awt.Dimension(610, 484));
@@ -1562,11 +1622,11 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(abugidaCharLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 214, Short.MAX_VALUE)
+            .addComponent(abugidaCharLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(abugidaCharLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 52, Short.MAX_VALUE)
+            .addComponent(abugidaCharLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 51, Short.MAX_VALUE)
         );
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -1737,6 +1797,15 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
         gridBagConstraints.weighty = 0.05;
         abugidaCard.add(noVowelCheckbox, gridBagConstraints);
 
+        abugidaDirectionalityButton.setFont(new java.awt.Font("LCS-ConstructorII", 0, 14));
+        abugidaDirectionalityButton.setText("L ➡ R");
+        abugidaDirectionalityButton.setMargin(new java.awt.Insets(0, 2, 0, 2));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 60;
+        gridBagConstraints.insets = new java.awt.Insets(5, 10, 0, 0);
+        abugidaCard.add(abugidaDirectionalityButton, gridBagConstraints);
+
         writingSystemPane.addTab("Abugida", abugidaCard);
 
         syllabaryCard.setName("syllabaryCard"); // NOI18N
@@ -1858,6 +1927,10 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
             .addComponent(visibleCharLabel)
         );
 
+        syllabaryDirectionalityButton.setFont(new java.awt.Font("LCS-ConstructorII", 0, 14));
+        syllabaryDirectionalityButton.setText("L ➡ R");
+        syllabaryDirectionalityButton.setMargin(new java.awt.Insets(0, 2, 0, 2));
+
         javax.swing.GroupLayout syllabaryCardLayout = new javax.swing.GroupLayout(syllabaryCard);
         syllabaryCard.setLayout(syllabaryCardLayout);
         syllabaryCardLayout.setHorizontalGroup(
@@ -1869,23 +1942,24 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
                     .addGroup(syllabaryCardLayout.createSequentialGroup()
                         .addGroup(syllabaryCardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(syllabaryCardLayout.createSequentialGroup()
-                                .addGroup(syllabaryCardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(syllabaryCardLayout.createSequentialGroup()
-                                        .addGap(73, 73, 73)
-                                        .addGroup(syllabaryCardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jLabel1)
-                                            .addGroup(syllabaryCardLayout.createSequentialGroup()
-                                                .addGap(54, 54, 54)
-                                                .addComponent(vowelNumCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                            .addGroup(syllabaryCardLayout.createSequentialGroup()
-                                                .addComponent(consonantNumLabel)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(vowelNumLabel))))
-                                    .addGroup(syllabaryCardLayout.createSequentialGroup()
+                                .addGroup(syllabaryCardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, syllabaryCardLayout.createSequentialGroup()
+                                        .addGap(8, 8, 8)
                                         .addComponent(setSyllableButton)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(consonantNumCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addGap(46, 46, 46)
+                                        .addGroup(syllabaryCardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(consonantNumLabel)
+                                            .addComponent(consonantNumCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(syllabaryCardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(vowelNumCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(vowelNumLabel))
+                                        .addGap(36, 36, 36))
+                                    .addGroup(syllabaryCardLayout.createSequentialGroup()
+                                        .addComponent(syllabaryDirectionalityButton)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jLabel1)
+                                        .addGap(18, 18, 18)))
                                 .addComponent(syllabaryCustomFontCheck))
                             .addComponent(autoFillSyllabaryButton, javax.swing.GroupLayout.Alignment.LEADING))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -1924,10 +1998,11 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
                 .addComponent(syllabaryScroller, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(syllabaryCardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
                     .addComponent(syllabaryCustomFontCheck)
                     .addComponent(syllabaryCustomFontField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(syllabaryChooseCustomFontButton))
+                    .addComponent(syllabaryChooseCustomFontButton)
+                    .addComponent(syllabaryDirectionalityButton)
+                    .addComponent(jLabel1))
                 .addGap(6, 6, 6)
                 .addGroup(syllabaryCardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(syllabaryCardLayout.createSequentialGroup()
@@ -3576,6 +3651,9 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
             punctuationTable.setValueAt(new String(Character.toChars(Integer.parseInt(writeSyst[3], 16))), 0, 1);
             punctAutoFillButtonActionPerformed(evt);
             autofillAlphabetButtonActionPerformed(evt);
+            if(writeSyst[writeSyst.length - 1].equals("rtl")){
+                directionalityButton.setSelected(true);
+            }
         }
         if(writeSyst[1].equals("Abjad")){
             String glyphuses = "IiMmFSUL";
@@ -3614,6 +3692,16 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
         }
         writingSystemPane.setSelectedIndex(tabs.indexOf(writeSyst[1])/12);
     }//GEN-LAST:event_useSystemButtonActionPerformed
+
+    private void directionalityButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_directionalityButtonActionPerformed
+        if(directionalityButton.isSelected()){
+            directionalityButton.setText("L ⬅ R");
+            writingSystem.put("Directionality", "rtl");
+        } else {
+            directionalityButton.setText("L ➡ R");
+            writingSystem.put("Directionality", "ltr");
+        }
+    }//GEN-LAST:event_directionalityButtonActionPerformed
 
     public void updateAlphaChar(int s){
         String ss = new String(Character.toChars(s));
@@ -3655,6 +3743,11 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
         HashMap ws = new HashMap();
         HashMap phonemes = new HashMap();
         String writeSyst =(String)writingSystem.get("System");
+        if(directionalityButton.isSelected()){
+            ws.put("Directionality","rtl");
+        } else {
+            ws.put("Directionality", "ltr");
+        }
         if(writeSyst.equals("Alphabet")){
             ws.put("System", "Alphabet");
             ws.put("GlyphsPerLetter", alphaGlyphsPerLetterSpinner.getValue());
@@ -3808,6 +3901,7 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
     private javax.swing.JComboBox abjadConsonantUsedInCombo;
     private javax.swing.JLabel abjadConsonantUsedInLabel;
     private javax.swing.JLabel abjadCurrentVLabel;
+    private javax.swing.JToggleButton abjadDirectionalityButton;
     private javax.swing.ButtonGroup abjadFontButtonGroup;
     private javax.swing.JTextField abjadFontField;
     private java.util.HashMap abjadGlyphUseMap;
@@ -3828,6 +3922,7 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
     private javax.swing.JLabel abugidaCurrentVLabel;
     private javax.swing.JRadioButton abugidaCustomFontRadio;
     private javax.swing.ButtonGroup abugidaDiacriticsButtonGroup;
+    private javax.swing.JToggleButton abugidaDirectionalityButton;
     private javax.swing.JButton abugidaDownCharButton;
     private javax.swing.ButtonGroup abugidaFontButtonGroup;
     private javax.swing.JTextField abugidaFontField;
@@ -3870,6 +3965,7 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
     private javax.swing.JRadioButton customAbjadFontRadio;
     private javax.swing.JRadioButton customFontRadio;
     private javax.swing.ButtonGroup diacriticsButtonGroup;
+    private javax.swing.JToggleButton directionalityButton;
     private javax.swing.JButton downAbjadCharButton;
     private javax.swing.JButton downButton;
     private javax.swing.JButton downCharAbjadButton;
@@ -3944,6 +4040,7 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
     private javax.swing.JButton syllabaryChooseCustomFontButton;
     private javax.swing.JCheckBox syllabaryCustomFontCheck;
     private javax.swing.JTextField syllabaryCustomFontField;
+    private javax.swing.JToggleButton syllabaryDirectionalityButton;
     private javax.swing.JButton syllabaryDownCharButton;
     private javax.swing.JButton syllabaryDownPageButton;
     private javax.swing.JScrollPane syllabaryScroller;

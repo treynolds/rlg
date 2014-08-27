@@ -14,17 +14,21 @@ public class RwDictionary {
     public void addEntry(RwDictionaryEntry s){
         words.add(s);
     }
-    
+
     public RwDictionaryEntry getEntryAt(int a){
         return words.elementAt(a);
     }
-    
+
     public void setDefinitonAt(String def, int a){
         words.elementAt(a).setDefinition(def);
     }
-    
+
     public void setMeaningAt(String mean, int a){
         words.elementAt(a).setMeaning(mean);
+    }
+
+    public void setEntryAt(RwDictionaryEntry entry, int position){
+        words.setElementAt(entry, position);
     }
 
     public boolean contains(RwDictionaryEntry entry){
@@ -147,5 +151,13 @@ public class RwDictionary {
 
     public int size(){
         return words.size();
+    }
+
+    public void insertEntryAt(RwDictionaryEntry entry, int location){
+        words.insertElementAt(entry, location);
+    }
+
+    public void removeEntryAt(int location){
+        words.remove(location);
     }
 }

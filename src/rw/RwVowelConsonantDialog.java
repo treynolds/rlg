@@ -31,13 +31,32 @@ public class RwVowelConsonantDialog extends javax.swing.JDialog {
         super(parent,modal);
         initComponents();
         setLocationRelativeTo(parent);
+        Vector d2 = new Vector();
+        for (int a=0;a<data.size();a++){
+            d2.add(new String(data.elementAt(a)+""));
+        }
+        int[] dist = new int[40];
+        Arrays.fill(dist, 1);
+        int pos = 1;
+        String sound = d2.elementAt(0)+"";
+        while(pos < d2.size()){
+            if(d2.elementAt(pos).equals(sound)){
+                dist[pos - 1] ++;
+                d2.remove(pos);
+            } else {
+                sound = d2.elementAt(pos)+"";
+                pos ++;
+            }
+        }
         dtm=(DefaultTableModel)jTable1.getModel();
-        dtm.setRowCount(data.size());
-        for(int a=0; a<data.size();a++){
-            dtm.setValueAt(data.elementAt(a), a, 1);
+        dtm.setRowCount(d2.size());
+        for(int a=0; a < d2.size();a++){
+            dtm.setValueAt(d2.elementAt(a), a, 1);
+            dtm.setValueAt(dist[a], a, 2);
         }
         updateTable();
-        jTextField1.setText(data.size()+"");
+        //jTextField1.setText(data.size()+"");
+        jSpinner1.setValue(d2.size());
     }
 
     /** This method is called from within the constructor to
@@ -52,7 +71,6 @@ public class RwVowelConsonantDialog extends javax.swing.JDialog {
         dtm = new javax.swing.table.DefaultTableModel();
         rwCellRenderer1 = new rw.RwCellRenderer();
         jLabel1 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         okButton = new javax.swing.JButton();
@@ -64,6 +82,7 @@ public class RwVowelConsonantDialog extends javax.swing.JDialog {
         upPageButton = new javax.swing.JButton();
         downPageButton = new javax.swing.JButton();
         currentCharField = new javax.swing.JTextField();
+        jSpinner1 = new javax.swing.JSpinner();
 
         dtm.addTableModelListener(new javax.swing.event.TableModelListener() {
             public void tableChanged(javax.swing.event.TableModelEvent evt) {
@@ -75,37 +94,31 @@ public class RwVowelConsonantDialog extends javax.swing.JDialog {
 
         jLabel1.setText("Number");
 
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
-            }
-        });
-
         jTable1.setAutoCreateRowSorter(true);
         jTable1.setFont(new java.awt.Font("LCS-ConstructorII", 0, 24));
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null}
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
             },
             new String [] {
-                "Unicode", "Visible"
+                "Unicode", "Orthography", "Distribution"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class
+                java.lang.String.class, java.lang.String.class, java.lang.Integer.class
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -122,6 +135,7 @@ public class RwVowelConsonantDialog extends javax.swing.JDialog {
         jTable1.getColumnModel().getColumn(0).setResizable(false);
         jTable1.getColumnModel().getColumn(1).setResizable(false);
         jTable1.getColumnModel().getColumn(1).setCellRenderer(rwCellRenderer1);
+        jTable1.getColumnModel().getColumn(2).setResizable(false);
 
         okButton.setText("OK");
         okButton.addActionListener(new java.awt.event.ActionListener() {
@@ -179,6 +193,13 @@ public class RwVowelConsonantDialog extends javax.swing.JDialog {
             }
         });
 
+        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(5), Integer.valueOf(1), null, Integer.valueOf(1)));
+        jSpinner1.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jSpinner1StateChanged(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -213,9 +234,9 @@ public class RwVowelConsonantDialog extends javax.swing.JDialog {
                                 .addContainerGap())))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 171, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 198, Short.MAX_VALUE)
                         .addComponent(updateButton)
                         .addContainerGap())))
         );
@@ -225,8 +246,8 @@ public class RwVowelConsonantDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(updateButton))
+                    .addComponent(updateButton)
+                    .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 246, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
@@ -253,11 +274,6 @@ public class RwVowelConsonantDialog extends javax.swing.JDialog {
         this.setVisible(false);
     }//GEN-LAST:event_cancelButtonActionPerformed
 
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
-        dtm=(DefaultTableModel)jTable1.getModel();
-        dtm.setRowCount(Integer.parseInt(jTextField1.getText()));
-    }//GEN-LAST:event_jTextField1ActionPerformed
-
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
         chosenOption = this.OK_OPTION;
         this.setVisible(false);
@@ -269,6 +285,8 @@ public class RwVowelConsonantDialog extends javax.swing.JDialog {
 
     private void updateTable(){
         dtm=(DefaultTableModel)jTable1.getModel();
+        int numberLetters = dtm.getRowCount();
+        //int dist = (int)(((100.0)/numberLetters)+.5);
         for(int a=0;a<dtm.getRowCount();a++){
             Object val0=dtm.getValueAt(a, 0);
             Object val1=dtm.getValueAt(a, 1);
@@ -291,6 +309,7 @@ public class RwVowelConsonantDialog extends javax.swing.JDialog {
                     v += "u" + u.substring(u.length()-4);
                 }
                 dtm.setValueAt(v, a, 0);
+                //dtm.setValueAt(dist, a, 2);
             }
         }
     }
@@ -302,7 +321,7 @@ public class RwVowelConsonantDialog extends javax.swing.JDialog {
     private void clearButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearButtonActionPerformed
         dtm=(DefaultTableModel)jTable1.getModel();
         dtm.setRowCount(0);
-        dtm.setRowCount(Integer.parseInt(jTextField1.getText()));
+        dtm.setRowCount(Integer.parseInt(jSpinner1.getValue()+""));
     }//GEN-LAST:event_clearButtonActionPerformed
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
@@ -369,11 +388,19 @@ public class RwVowelConsonantDialog extends javax.swing.JDialog {
         updateButtonActionPerformed(evt);
     }//GEN-LAST:event_upPageButtonActionPerformed
 
+    private void jSpinner1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinner1StateChanged
+        dtm=(DefaultTableModel)jTable1.getModel();
+        dtm.setRowCount(Integer.parseInt(jSpinner1.getValue()+""));
+    }//GEN-LAST:event_jSpinner1StateChanged
+
     public Vector getData(){
         Vector v=new Vector();
         for(int a=0;a<dtm.getRowCount();a++){
-            v.add(dtm.getValueAt(a, 1));
+            for(int b=0;b<Integer.parseInt(dtm.getValueAt(a, 2)+"");b++){
+                v.add(dtm.getValueAt(a, 1));
+            }
         }
+        System.out.println(v);
         return v;
     }
     /**
@@ -406,8 +433,8 @@ public class RwVowelConsonantDialog extends javax.swing.JDialog {
     private javax.swing.table.DefaultTableModel dtm;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JSpinner jSpinner1;
     private javax.swing.JTable jTable1;
-    private javax.swing.JTextField jTextField1;
     private javax.swing.JButton okButton;
     private rw.RwCellRenderer rwCellRenderer1;
     private javax.swing.JButton upCharacterButton;

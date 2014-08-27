@@ -100,6 +100,15 @@ public class RwDictionaryEntry {
         return ((Integer)syllableBreaks.elementAt(1)).intValue();
     }
 
+    public String getSyllableBreaks(){
+        return syllableBreaks.toString();
+    }
+
+    public void setSyllableBreaks(String breaks){
+        breaks = breaks.substring(1,breaks.length()-1);
+        System.out.println(breaks);
+    }
+
     public void setDefinition(String define){
         definition = define;
     }
@@ -209,7 +218,7 @@ public class RwDictionaryEntry {
                     if(syllable.charAt(a) == '{'){
                         if(syllable.indexOf('}',a) > 0){
                             char let=syllable.charAt(a + 1);
-                            if(word.charAt(word.length()-1) == let){
+                            if(word.length() >= 1 && word.charAt(word.length()-1) == let){
                                 int z = syllable.indexOf('}',a);
                                 String[] choosables = syllable.substring(syllable.indexOf(":", a + 1) + 1, z).split(",");
                                 int x = (int)(Math.random()*choosables.length);
@@ -234,12 +243,16 @@ public class RwDictionaryEntry {
                                 if(pct <= percent){
                                     word += consonants.get(letter);
                                 }
-                            }
-                            if(syllable.charAt(a+1) == 'V'){
+                            } else if(syllable.charAt(a+1) == 'V'){
                                 int x = (int)(Math.random()*100);
                                 int y = (int)(Math.random()*vowels.size());
                                 if(x <= percent){
                                    word += vowels.get(y);
+                                }
+                            } else {
+                                int x = (int)(Math.random()*100);
+                                if(x <= percent){
+                                    word += syllable.charAt(a + 1);
                                 }
                             }
                         } else {

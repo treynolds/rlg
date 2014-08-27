@@ -13,7 +13,6 @@ import java.awt.Toolkit;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Map.Entry;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.helpers.*;
@@ -23,6 +22,10 @@ import javax.xml.transform.stream.*;
 import javax.xml.transform.sax.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import javax.swing.event.UndoableEditEvent;
+import javax.swing.event.UndoableEditListener;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.UndoManager;
 
 /*
  * RandomWords.java
@@ -66,6 +69,7 @@ public class RandomWords extends javax.swing.JFrame {
         writingSystem.put("GlyphsPerLetter", 2);
         writingSystem.put("System", "Alphabet");
         writingSystem.put("FontType", "borrowed");
+        writingSystem.put("Directionality", "ltr");
         HashMap gum = new HashMap();
         gum.put("Glyph_1", "Lower");
         gum.put("Glyph_2", "Upper");
@@ -95,33 +99,85 @@ public class RandomWords extends javax.swing.JFrame {
     private void initComponents() {
 
         vowels = new java.util.Vector();
-        vowels.add("a");
-        vowels.add("e");
-        vowels.add("i");
-        vowels.add("o");
-        vowels.add("u");
+        for(int a=0;a<20;a++){
+            vowels.add("a");
+        }
+        for(int a=0;a<20;a++){
+            vowels.add("e");
+        }
+        for(int a=0;a<20;a++){
+            vowels.add("i");
+        }
+        for(int a=0;a<20;a++){
+            vowels.add("o");
+        }
+        for(int a=0;a<20;a++){
+            vowels.add("u");
+        }
         consonants = new java.util.Vector();
-        consonants.add("b");
-        consonants.add("c");
-        consonants.add("d");
-        consonants.add("f");
-        consonants.add("g");
-        consonants.add("h");
-        consonants.add("j");
-        consonants.add("k");
-        consonants.add("l");
-        consonants.add("m");
-        consonants.add("n");
-        consonants.add("p");
-        consonants.add("q");
-        consonants.add("r");
-        consonants.add("s");
-        consonants.add("t");
-        consonants.add("v");
-        consonants.add("w");
-        consonants.add("x");
-        consonants.add("y");
-        consonants.add("z");
+        for(int a=0;a<5;a++){
+            consonants.add("b");
+        }
+        for(int a=0;a<5;a++){
+            consonants.add("c");
+        }
+        for(int a=0;a<5;a++){
+            consonants.add("d");
+        }
+        for(int a=0;a<5;a++){
+            consonants.add("f");
+        }
+        for(int a=0;a<5;a++){
+            consonants.add("g");
+        }
+        for(int a=0;a<5;a++){
+            consonants.add("h");
+        }
+        for(int a=0;a<5;a++){
+            consonants.add("j");
+        }
+        for(int a=0;a<5;a++){
+            consonants.add("k");
+        }
+        for(int a=0;a<5;a++){
+            consonants.add("l");
+        }
+        for(int a=0;a<5;a++){
+            consonants.add("m");
+        }
+        for(int a=0;a<5;a++){
+            consonants.add("n");
+        }
+        for(int a=0;a<5;a++){
+            consonants.add("p");
+        }
+        for(int a=0;a<5;a++){
+            consonants.add("q");
+        }
+        for(int a=0;a<5;a++){
+            consonants.add("r");
+        }
+        for(int a=0;a<5;a++){
+            consonants.add("s");
+        }
+        for(int a=0;a<5;a++){
+            consonants.add("t");
+        }
+        for(int a=0;a<5;a++){
+            consonants.add("v");
+        }
+        for(int a=0;a<5;a++){
+            consonants.add("w");
+        }
+        for(int a=0;a<5;a++){
+            consonants.add("x");
+        }
+        for(int a=0;a<5;a++){
+            consonants.add("y");
+        }
+        for(int a=0;a<5;a++){
+            consonants.add("z");
+        }
         words = new java.util.Vector();
         dictionary = new rw.RwDictionary();
         tcr = new rw.RwCellRenderer();
@@ -149,6 +205,7 @@ public class RandomWords extends javax.swing.JFrame {
             posRules.put(posArry[a], rule);
         }
         syllablePatternList = new java.lang.String();
+        pastableEntry = new rw.RwDictionaryEntry();
         jPanel1 = new javax.swing.JPanel();
         wordScroller = new javax.swing.JScrollPane();
         wordTable = new javax.swing.JTable();
@@ -181,7 +238,6 @@ public class RandomWords extends javax.swing.JFrame {
         pasteItem = new javax.swing.JMenuItem();
         jSeparator4 = new javax.swing.JPopupMenu.Separator();
         findItem = new javax.swing.JMenuItem();
-        replaceItem = new javax.swing.JMenuItem();
         projectMenu = new javax.swing.JMenu();
         generateItem = new javax.swing.JMenuItem();
         consonantItem = new javax.swing.JMenuItem();
@@ -400,20 +456,10 @@ public class RandomWords extends javax.swing.JFrame {
 
         undoItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Z, java.awt.event.InputEvent.CTRL_MASK));
         undoItem.setText("Undo"); // NOI18N
-        undoItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                undoItemActionPerformed(evt);
-            }
-        });
         editMenu.add(undoItem);
 
         redoItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Y, java.awt.event.InputEvent.CTRL_MASK));
         redoItem.setText("Redo"); // NOI18N
-        redoItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                redoItemActionPerformed(evt);
-            }
-        });
         editMenu.add(redoItem);
         editMenu.add(jSeparator3);
 
@@ -445,7 +491,12 @@ public class RandomWords extends javax.swing.JFrame {
         editMenu.add(editMenuItem);
 
         insertMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, java.awt.event.InputEvent.CTRL_MASK));
-        insertMenuItem.setText("Insert");
+        insertMenuItem.setText("Insert ...");
+        insertMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                insertMenuItemActionPerformed(evt);
+            }
+        });
         editMenu.add(insertMenuItem);
 
         pasteItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_V, java.awt.event.InputEvent.CTRL_MASK));
@@ -466,15 +517,6 @@ public class RandomWords extends javax.swing.JFrame {
             }
         });
         editMenu.add(findItem);
-
-        replaceItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.CTRL_MASK));
-        replaceItem.setText("Replace"); // NOI18N
-        replaceItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                replaceItemActionPerformed(evt);
-            }
-        });
-        editMenu.add(replaceItem);
 
         jMenuBar1.add(editMenu);
 
@@ -1455,24 +1497,35 @@ public class RandomWords extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_saveDefinitionsAsItemActionPerformed
 
-    private void undoItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_undoItemActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_undoItemActionPerformed
-
-    private void redoItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_redoItemActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_redoItemActionPerformed
-
     private void cutItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cutItemActionPerformed
-        // TODO add your handling code here:
+        if(wordTable.getSelectedRow()>=0){
+            pastableEntry = (RwDictionaryEntry)dictionary.getEntryAt(wordTable.getSelectedRow());
+            dictionary.removeEntryAt(wordTable.getSelectedRow());
+            wordCount--;
+            refreshButtonActionPerformed(evt);
+        } else {
+            JOptionPane.showConfirmDialog(this, "Please select an entry to edit!", "Oops!", JOptionPane.PLAIN_MESSAGE,JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_cutItemActionPerformed
 
     private void copyItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyItemActionPerformed
-        // TODO add your handling code here:
+        if(wordTable.getSelectedRow()>=0){
+            pastableEntry = (RwDictionaryEntry)dictionary.getEntryAt(wordTable.getSelectedRow());
+        } else {
+            JOptionPane.showConfirmDialog(this, "Please select an entry to edit!", "Oops!", JOptionPane.PLAIN_MESSAGE,JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_copyItemActionPerformed
 
     private void pasteItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pasteItemActionPerformed
-        // TODO add your handling code here:
+        if(wordTable.getSelectedRow()>=0){
+            DefaultTableModel wtm=(DefaultTableModel)wordTable.getModel();
+            int row = wordTable.getSelectedRow();
+            dictionary.insertEntryAt(pastableEntry, row);
+            wordCount++;
+            refreshButtonActionPerformed(evt);
+        } else {
+            JOptionPane.showConfirmDialog(this, "Please select an entry to edit!", "Oops!", JOptionPane.PLAIN_MESSAGE,JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_pasteItemActionPerformed
 
     private void findItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_findItemActionPerformed
@@ -1488,10 +1541,6 @@ public class RandomWords extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_findItemActionPerformed
-
-    private void replaceItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_replaceItemActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_replaceItemActionPerformed
 
     private void writingItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_writingItemActionPerformed
         RwWritingSystemChooser rwwc = new RwWritingSystemChooser(this, "Set Up Writing System", true,
@@ -1557,7 +1606,7 @@ public class RandomWords extends javax.swing.JFrame {
     }//GEN-LAST:event_maxSyllablesItemActionPerformed
 
     private void translateItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_translateItemActionPerformed
-        RwTranslationDialog rwt = new RwTranslationDialog(this, false);
+        RwTranslationDialog rwt = new RwTranslationDialog(this, false, writingSystem.get("Directionality")+"");
         rwt.setVisible(true);
     }//GEN-LAST:event_translateItemActionPerformed
 
@@ -1587,12 +1636,40 @@ public class RandomWords extends javax.swing.JFrame {
             eed.writtenFormField.setText(entry.getWrittenForm());
             eed.transliterationField.setText(entry.getTransliteration());
             eed.ptTagField.setText(entry.getPtTag());
-            //eed.syllableBreaksField.setText(entry.getSyllableBreaks());
+            eed.syllableBreaksField.setText(entry.getSyllableBreaks());
             eed.setVisible(true);
+            if( eed.CHOSEN_OPTION == eed.OK_OPTION){
+                entry = eed.getEntry();
+                dictionary.setEntryAt(entry, wordTable.getSelectedRow());
+                eed.dispose();
+                refreshButtonActionPerformed(evt);
+            } else {
+                eed.dispose();
+            }
+
         } else {
             JOptionPane.showConfirmDialog(this, "Please select an entry to edit!", "Oops!", JOptionPane.PLAIN_MESSAGE,JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_editMenuItemActionPerformed
+
+    private void insertMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_insertMenuItemActionPerformed
+        if(wordTable.getSelectedRow()>=0){
+            DefaultTableModel wtm=(DefaultTableModel)wordTable.getModel();
+            int row = wordTable.getSelectedRow();
+            rwEditEntryDialog eed = new rwEditEntryDialog(this, true);
+            eed.setVisible(true);
+            if( eed.CHOSEN_OPTION == eed.OK_OPTION){
+                wtm.insertRow(row, new Object[] {});
+                dictionary.setEntryAt(eed.getEntry(),row);
+                eed.dispose();
+                refreshButtonActionPerformed(evt);
+            } else {
+                eed.dispose();
+            }
+        } else {
+            JOptionPane.showConfirmDialog(this, "Please select an entry to edit!", "Oops!", JOptionPane.PLAIN_MESSAGE,JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_insertMenuItemActionPerformed
 
     /**
      * @param args the command line arguments
@@ -2189,6 +2266,7 @@ public class RandomWords extends javax.swing.JFrame {
     private javax.swing.JMenuItem loadItem;
     private javax.swing.JMenuItem maxSyllablesItem;
     private javax.swing.JMenuItem newItem;
+    private rw.RwDictionaryEntry pastableEntry;
     private javax.swing.JMenuItem pasteItem;
     private java.util.HashMap posRules;
     private javax.swing.JMenu projectMenu;
@@ -2197,7 +2275,6 @@ public class RandomWords extends javax.swing.JFrame {
     private javax.swing.JMenuItem quitItem;
     private javax.swing.JMenuItem redoItem;
     private javax.swing.JButton refreshButton;
-    private javax.swing.JMenuItem replaceItem;
     private javax.swing.JMenuItem rulesItem;
     private javax.swing.JMenuItem saveAsItem;
     private javax.swing.JButton saveButton;
@@ -2220,4 +2297,5 @@ public class RandomWords extends javax.swing.JFrame {
     private int wordCount;
     private HashMap writingSystem = new HashMap();
     private boolean syllabicEfficiency = true;
+    private UndoManager urManager = new UndoManager();
 }

@@ -137,7 +137,7 @@ public class rwEditEntryDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 10);
         getContentPane().add(syllableBreaksLabel, gridBagConstraints);
 
-        posField.setFont(new java.awt.Font("LCS-ConstructorII", 1, 18)); // NOI18N
+        posField.setFont(new java.awt.Font("LCS-ConstructorII", 1, 18));
         posField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         posField.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(255, 255, 255), new java.awt.Color(255, 255, 255), new java.awt.Color(153, 153, 153), new java.awt.Color(153, 153, 153)));
         posField.setMinimumSize(new java.awt.Dimension(120, 30));
@@ -152,7 +152,7 @@ public class rwEditEntryDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
         getContentPane().add(posField, gridBagConstraints);
 
-        definitionField.setFont(new java.awt.Font("LCS-ConstructorII", 1, 18)); // NOI18N
+        definitionField.setFont(new java.awt.Font("LCS-ConstructorII", 1, 18));
         definitionField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         definitionField.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(255, 255, 255), new java.awt.Color(255, 255, 255), new java.awt.Color(153, 153, 153), new java.awt.Color(153, 153, 153)));
         definitionField.setMinimumSize(new java.awt.Dimension(120, 30));
@@ -166,7 +166,7 @@ public class rwEditEntryDialog extends javax.swing.JDialog {
         gridBagConstraints.weighty = 0.2;
         getContentPane().add(definitionField, gridBagConstraints);
 
-        rootField.setFont(new java.awt.Font("LCS-ConstructorII", 1, 18)); // NOI18N
+        rootField.setFont(new java.awt.Font("LCS-ConstructorII", 1, 18));
         rootField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         rootField.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(255, 255, 255), new java.awt.Color(255, 255, 255), new java.awt.Color(153, 153, 153), new java.awt.Color(153, 153, 153)));
         rootField.setMinimumSize(new java.awt.Dimension(120, 30));
@@ -180,7 +180,7 @@ public class rwEditEntryDialog extends javax.swing.JDialog {
         gridBagConstraints.weighty = 0.2;
         getContentPane().add(rootField, gridBagConstraints);
 
-        syllableCountField.setFont(new java.awt.Font("LCS-ConstructorII", 1, 18)); // NOI18N
+        syllableCountField.setFont(new java.awt.Font("LCS-ConstructorII", 1, 18));
         syllableCountField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         syllableCountField.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(255, 255, 255), new java.awt.Color(255, 255, 255), new java.awt.Color(153, 153, 153), new java.awt.Color(153, 153, 153)));
         syllableCountField.setMinimumSize(new java.awt.Dimension(120, 30));
@@ -194,7 +194,7 @@ public class rwEditEntryDialog extends javax.swing.JDialog {
         gridBagConstraints.weighty = 0.2;
         getContentPane().add(syllableCountField, gridBagConstraints);
 
-        syllableBreaksField.setFont(new java.awt.Font("LCS-ConstructorII", 1, 18)); // NOI18N
+        syllableBreaksField.setFont(new java.awt.Font("LCS-ConstructorII", 1, 18));
         syllableBreaksField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         syllableBreaksField.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(255, 255, 255), new java.awt.Color(255, 255, 255), new java.awt.Color(153, 153, 153), new java.awt.Color(153, 153, 153)));
         syllableBreaksField.setMinimumSize(new java.awt.Dimension(120, 30));
@@ -286,7 +286,7 @@ public class rwEditEntryDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 10);
         getContentPane().add(transliterationLabel, gridBagConstraints);
 
-        pronunciationField.setFont(new java.awt.Font("LCS-ConstructorII", 1, 18)); // NOI18N
+        pronunciationField.setFont(new java.awt.Font("LCS-ConstructorII", 1, 18));
         pronunciationField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         pronunciationField.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(255, 255, 255), new java.awt.Color(255, 255, 255), new java.awt.Color(153, 153, 153), new java.awt.Color(153, 153, 153)));
         pronunciationField.setMinimumSize(new java.awt.Dimension(120, 30));
@@ -304,6 +304,7 @@ public class rwEditEntryDialog extends javax.swing.JDialog {
         writtenFormField.setFont(new java.awt.Font("LCS-ConstructorII", 1, 18)); // NOI18N
         writtenFormField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         writtenFormField.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(255, 255, 255), new java.awt.Color(255, 255, 255), new java.awt.Color(153, 153, 153), new java.awt.Color(153, 153, 153)));
+        writtenFormField.setEnabled(false);
         writtenFormField.setMinimumSize(new java.awt.Dimension(120, 30));
         writtenFormField.setPreferredSize(new java.awt.Dimension(120, 30));
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -315,7 +316,7 @@ public class rwEditEntryDialog extends javax.swing.JDialog {
         gridBagConstraints.weighty = 0.2;
         getContentPane().add(writtenFormField, gridBagConstraints);
 
-        ptTagField.setFont(new java.awt.Font("LCS-ConstructorII", 1, 18)); // NOI18N
+        ptTagField.setFont(new java.awt.Font("LCS-ConstructorII", 1, 18));
         ptTagField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         ptTagField.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(255, 255, 255), new java.awt.Color(255, 255, 255), new java.awt.Color(153, 153, 153), new java.awt.Color(153, 153, 153)));
         ptTagField.setMinimumSize(new java.awt.Dimension(120, 30));
@@ -329,7 +330,7 @@ public class rwEditEntryDialog extends javax.swing.JDialog {
         gridBagConstraints.weighty = 0.2;
         getContentPane().add(ptTagField, gridBagConstraints);
 
-        frequencyField.setFont(new java.awt.Font("LCS-ConstructorII", 1, 18)); // NOI18N
+        frequencyField.setFont(new java.awt.Font("LCS-ConstructorII", 1, 18));
         frequencyField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         frequencyField.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(255, 255, 255), new java.awt.Color(255, 255, 255), new java.awt.Color(153, 153, 153), new java.awt.Color(153, 153, 153)));
         frequencyField.setMinimumSize(new java.awt.Dimension(120, 30));
@@ -346,6 +347,7 @@ public class rwEditEntryDialog extends javax.swing.JDialog {
         transliterationField.setFont(new java.awt.Font("LCS-ConstructorII", 1, 18)); // NOI18N
         transliterationField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         transliterationField.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(255, 255, 255), new java.awt.Color(255, 255, 255), new java.awt.Color(153, 153, 153), new java.awt.Color(153, 153, 153)));
+        transliterationField.setEnabled(false);
         transliterationField.setMinimumSize(new java.awt.Dimension(120, 30));
         transliterationField.setPreferredSize(new java.awt.Dimension(120, 30));
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -407,7 +409,8 @@ public class rwEditEntryDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
-        dispose();
+        CHOSEN_OPTION = OK_OPTION;
+        setVisible(false);
     }//GEN-LAST:event_okButtonActionPerformed
 
     private void clearButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearButtonActionPerformed
@@ -415,9 +418,23 @@ public class rwEditEntryDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_clearButtonActionPerformed
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
-        dispose();
+        CHOSEN_OPTION = CANCEL_OPTION;
+        setVisible(false);
     }//GEN-LAST:event_cancelButtonActionPerformed
 
+    public RwDictionaryEntry getEntry(){
+        rwe.setPos(posField.getText());
+        rwe.setFrequency(Integer.parseInt(frequencyField.getText()));
+        rwe.setDefinition(definitionField.getText());
+        rwe.setPtTag(ptTagField.getText());
+        rwe.setRoot(rootField.getText());
+        rwe.setSyllableCount(syllableCountField.getText());
+        rwe.setTransliteration(transliterationField.getText());
+        rwe.setWrittenForm(writtenFormField.getText());
+        rwe.setSyllableBreaks(syllableBreaksField.getText());
+        rwe.setMeaning(pronunciationField.getText());
+        return rwe;
+    }
     /**
      * @param args the command line arguments
      */
@@ -486,4 +503,8 @@ public class rwEditEntryDialog extends javax.swing.JDialog {
     public javax.swing.JTextField writtenFormField;
     public javax.swing.JLabel writtenFormLabel;
     // End of variables declaration//GEN-END:variables
+    public int CANCEL_OPTION = 0;
+    public int OK_OPTION = 1;
+    public int CHOSEN_OPTION = CANCEL_OPTION;
+    private RwDictionaryEntry rwe = new RwDictionaryEntry();
 }
