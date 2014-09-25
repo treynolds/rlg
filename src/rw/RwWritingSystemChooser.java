@@ -8,17 +8,31 @@
  *
  * Created on Feb 5, 2011, 3:51:50 PM
  */
-
 package rw;
 
 import java.awt.*;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.*;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.sax.SAXTransformerFactory;
+import javax.xml.transform.sax.TransformerHandler;
+import javax.xml.transform.stream.StreamResult;
+import org.xml.sax.helpers.AttributesImpl;
+import org.w3c.dom.NodeList;
+import org.xml.sax.*;
+import javax.xml.xpath.*;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  *
@@ -40,7 +54,7 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
     }
 
     public RwWritingSystemChooser(Frame parent, String title, boolean modal, Vector vowels,
-            Vector consonants, HashMap writingSystem){
+            Vector consonants, HashMap writingSystem) {
         super(parent, title, modal);
         initComponents();
         directionalityButton.setVisible(false);
@@ -48,37 +62,44 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
         abugidaDirectionalityButton.setVisible(false);
         syllabaryDirectionalityButton.setVisible(false);
         setLocationRelativeTo(parent);
+        vows = vowels;
+        cons = consonants;
+        setupSystem(vowels, consonants, writingSystem);
+    }
+
+    public void setupSystem(Vector vowels,
+            Vector consonants, HashMap writingSystem) {
         int pos = 1;
-        Vector vowls =  new Vector();
+        Vector vowls = new Vector();
         Vector consnts = new Vector();
-        for (int v=0;v<vowels.size();v++){
-            vowls.add(new String(vowels.elementAt(v)+""));
+        for (int v = 0; v < vowels.size(); v++) {
+            vowls.add(new String(vowels.elementAt(v) + ""));
         }
-        for (int v=0;v<consonants.size();v++){
-            consnts.add(new String(consonants.elementAt(v)+""));
+        for (int v = 0; v < consonants.size(); v++) {
+            consnts.add(new String(consonants.elementAt(v) + ""));
         }
-        String sound = vowels.elementAt(0)+"";
-        while(pos < vowls.size()){
-            if(vowls.elementAt(pos).equals(sound)){
+        String sound = vowels.elementAt(0) + "";
+        while (pos < vowls.size()) {
+            if (vowls.elementAt(pos).equals(sound)) {
                 vowls.remove(pos);
             } else {
-                sound = vowls.elementAt(pos)+"";
-                pos ++;
+                sound = vowls.elementAt(pos) + "";
+                pos++;
             }
         }
         pos = 1;
-        sound = consnts.elementAt(0)+"";
-        while(pos < consnts.size()){
-            if(consnts.elementAt(pos).equals(sound)){
+        sound = consnts.elementAt(0) + "";
+        while (pos < consnts.size()) {
+            if (consnts.elementAt(pos).equals(sound)) {
                 consnts.remove(pos);
             } else {
-                sound = consnts.elementAt(pos)+"";
-                pos ++;
+                sound = consnts.elementAt(pos) + "";
+                pos++;
             }
         }
-        DefaultTableModel dtm4 = (DefaultTableModel)syllabaryTable.getModel();
-        String fontname = (String)writingSystem.get("Font");
-        Font defaultFont = new Font("LCS-ConstructorII",0,14);
+        DefaultTableModel dtm4 = (DefaultTableModel) syllabaryTable.getModel();
+        String fontname = (String) writingSystem.get("Font");
+        Font defaultFont = new Font("LCS-ConstructorII", 0, 14);
         syllabaryTable.setFont(defaultFont);
         alphaTable.setFont(defaultFont);
         abjadTable.setFont(defaultFont);
@@ -87,44 +108,44 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
         dtm4.setColumnCount(0);
         dtm4.setRowCount(0);
         Vector sconsonants = new Vector(consnts);
-        if (!sconsonants.contains("NC")){
+        if (!sconsonants.contains("NC")) {
             sconsonants.add("NC");
         }
         dtm4.addColumn(" ", sconsonants);
         vowelNumCombo.removeAllItems();
         consonantNumCombo.removeAllItems();
-        for(int a = 0; a<vowls.size(); a++){
+        for (int a = 0; a < vowls.size(); a++) {
             dtm4.addColumn(vowls.elementAt(a));
             vowelNumCombo.addItem(vowls.elementAt(a));
         }
         dtm4.addColumn("NV");
         vowelNumCombo.addItem("NV");
-        for(int a=0; a<consnts.size(); a++){
+        for (int a = 0; a < consnts.size(); a++) {
             consonantNumCombo.addItem(consnts.elementAt(a));
         }
         consonantNumCombo.addItem("NC");
-        DefaultTableModel dtm=(DefaultTableModel)alphaTable.getModel();
-        DefaultTableModel dtm1=(DefaultTableModel)abjadTable.getModel();
-        DefaultTableModel dtm2=(DefaultTableModel)abugidaTable.getModel();
-        DefaultTableModel dtm3=(DefaultTableModel)multigraphicTable.getModel();
-        DefaultTableModel dtm5=(DefaultTableModel)punctuationTable.getModel();
-        DefaultTableModel dtm6=(DefaultTableModel)presetsTable.getModel();
+        DefaultTableModel dtm = (DefaultTableModel) alphaTable.getModel();
+        DefaultTableModel dtm1 = (DefaultTableModel) abjadTable.getModel();
+        DefaultTableModel dtm2 = (DefaultTableModel) abugidaTable.getModel();
+        DefaultTableModel dtm3 = (DefaultTableModel) multigraphicTable.getModel();
+        DefaultTableModel dtm5 = (DefaultTableModel) punctuationTable.getModel();
+        DefaultTableModel dtm6 = (DefaultTableModel) presetsTable.getModel();
         dtm.setRowCount(0);
         dtm1.setRowCount(0);
         dtm2.setRowCount(0);
         dtm3.setRowCount(0);
-        Vector ds=new Vector();
+        Vector ds = new Vector();
         ds.addAll(vowls);
         ds.addAll(consnts);
-        Object[] ob=ds.toArray();
+        Object[] ob = ds.toArray();
         Arrays.sort(ob);
         dtm.setRowCount(ob.length);
         dtm1.setRowCount(ob.length);
         dtm2.setRowCount(ob.length);
         dtm3.setRowCount(ob.length);
-        HashMap phonemes = (HashMap)writingSystem.get("Phonemes");
-        System.out.println(phonemes+"");
-        for(int a=0; a<ob.length; a++){
+        HashMap phonemes = (HashMap) writingSystem.get("Phonemes");
+        System.out.println(phonemes + "");
+        for (int a = 0; a < ob.length; a++) {
             dtm.setValueAt(ob[a], a, 0);
             dtm1.setValueAt(ob[a], a, 0);
             dtm2.setValueAt(ob[a], a, 0);
@@ -143,13 +164,13 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
         tabs.add("Syllabary");
         tabs.add("Multigraphic");
         writingSystemPane.setSelectedIndex(tabs.indexOf(writingSystem.get("System")));
-        if (writingSystemPane.getSelectedIndex() == 0){  // Alphabet
+        if (writingSystemPane.getSelectedIndex() == 0) {  // Alphabet
             consonants.remove("NV");
             vowels.remove("NC");
             phonemes.remove("NC");
             phonemes.remove("NV");
             fontField.setText(fontname);
-            if(writingSystem.get("FontType").equals("borrowed")){
+            if (writingSystem.get("FontType").equals("borrowed")) {
                 borrowedCharsRadio.setSelected(true);
             } else {
                 customFontRadio.setSelected(true);
@@ -158,37 +179,36 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
                 chooseAlphabetFontButton.setEnabled(true);
             }
             alphaGlyphsPerLetterSpinner.setValue(Integer.parseInt(writingSystem.get("GlyphsPerLetter") + ""));
-            for(int a=0;a<phonemes.size();a++){
-                String[] z = (phonemes.get(ob[a])+"").split(" ");
-                for(int b = 0; b < z.length; b ++){
+            for (int a = 0; a < phonemes.size(); a++) {
+                String[] z = (phonemes.get(ob[a]) + "").split(" ");
+                for (int b = 0; b < z.length; b++) {
                     dtm.setValueAt(z[b], a, b + 1);
                 }
             }
             tcr2.setFontName(writingSystem.get("Font").toString());
-            HashMap gum=(HashMap)writingSystem.get("GlyphUseMap");
+            HashMap gum = (HashMap) writingSystem.get("GlyphUseMap");
             int ng = Integer.parseInt(writingSystem.get("GlyphsPerLetter") + "");
-            for(int nga = ng; nga > 0; nga --){
-                //System.out.println("Glyph_"+nga);
+            for (int nga = ng; nga > 0; nga--) {
                 alphaLetterGlyphNumberCombo.setSelectedItem("Glyph_" + nga);
                 alphaLetterUsedInCombo.setSelectedItem(gum.get("Glyph_" + nga));
             }
-            capitalizationCombo.setSelectedItem((String)writingSystem.get("CapRule"));
-            characterLabel.setFont(new Font(writingSystem.get("Font")+"",Font.PLAIN,30));
+            capitalizationCombo.setSelectedItem((String) writingSystem.get("CapRule"));
+            characterLabel.setFont(new Font(writingSystem.get("Font") + "", Font.PLAIN, 30));
         } else if (writingSystemPane.getSelectedIndex() == 1) {  // Abjad
             abjadFontField.setText(fontname);
-            if(writingSystem.get("FontType").equals("borrowed")){
+            if (writingSystem.get("FontType").equals("borrowed")) {
                 borrowedAbjadFontRadio.setSelected(true);
             } else {
                 customAbjadFontRadio.setSelected(true);
                 abjadFontField.setEnabled(true);
                 abjadFontField.setEditable(true);
                 chooseAbjadFontButton.setEnabled(true);
-                abjadCharLabel.setFont(new Font(writingSystem.get("Font")+"",Font.PLAIN,30));
+                abjadCharLabel.setFont(new Font(writingSystem.get("Font") + "", Font.PLAIN, 30));
             }
             abjadGlyphsPerConsonantSpinner.setValue(writingSystem.get("GlyphsPerLetter"));
-            for(int a=0;a<phonemes.size();a++){
-                String[] z= (phonemes.get(ob[a])+"").split(" ");
-                for(int b = 0; b < z.length; b ++){
+            for (int a = 0; a < phonemes.size(); a++) {
+                String[] z = (phonemes.get(ob[a]) + "").split(" ");
+                for (int b = 0; b < z.length; b++) {
                     dtm1.setValueAt(z[b], a, b + 1);
                 }
             }
@@ -197,7 +217,7 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
             //showVowelsCheck.setSelected(b);
         } else if (writingSystemPane.getSelectedIndex() == 2) {  // Abugida
             abugidaFontField.setText(fontname);
-            if(writingSystem.get("FontType").equals("borrowed")){
+            if (writingSystem.get("FontType").equals("borrowed")) {
                 abugidaBorrowedFontRadio.setSelected(true);
             } else {
                 abugidaCustomFontRadio.setSelected(true);
@@ -205,26 +225,26 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
                 abugidaFontField.setEditable(true);
                 abugidaChooseFontButton.setEnabled(true);
                 tcr2.setFontName(writingSystem.get("Font").toString());
-                abugidaCharLabel.setFont(new Font(writingSystem.get("Font")+"",Font.PLAIN,30));
+                abugidaCharLabel.setFont(new Font(writingSystem.get("Font") + "", Font.PLAIN, 30));
             }
             int pns = phonemes.size();
-            if(phonemes.containsKey("VowelCarrier")){
+            if (phonemes.containsKey("VowelCarrier")) {
                 vowelCarrierCheck.setSelected(true);
                 dtm2.setRowCount(dtm2.getRowCount() + 1);
-                dtm2.setValueAt("VowelCarrier", dtm2.getRowCount()-1, 0);
-                String vc = (phonemes.get("VowelCarrier")+"");
-                dtm2.setValueAt(vc, dtm2.getRowCount()-1, 1);
-                pns --;
+                dtm2.setValueAt("VowelCarrier", dtm2.getRowCount() - 1, 0);
+                String vc = (phonemes.get("VowelCarrier") + "");
+                dtm2.setValueAt(vc, dtm2.getRowCount() - 1, 1);
+                pns--;
             }
-            if(phonemes.containsKey("NoVowel")){
+            if (phonemes.containsKey("NoVowel")) {
                 noVowelCheckbox.setSelected(true);
                 dtm2.setRowCount(dtm2.getRowCount() + 1);
-                dtm2.setValueAt("NoVowel", dtm2.getRowCount()-1, 0);
-                String vc = (phonemes.get("NoVowel")+"");
-                dtm2.setValueAt(vc, dtm2.getRowCount()-1, 1);
-                pns --;
+                dtm2.setValueAt("NoVowel", dtm2.getRowCount() - 1, 0);
+                String vc = (phonemes.get("NoVowel") + "");
+                dtm2.setValueAt(vc, dtm2.getRowCount() - 1, 1);
+                pns--;
             }
-            for(int a=0; a<pns; a++){
+            for (int a = 0; a < pns; a++) {
                 String p = (phonemes.get(ob[a])).toString();
                 dtm2.setValueAt(p, a, 1);
             }
@@ -232,80 +252,80 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
             tcr2.setFontName(writingSystem.get("Font").toString());
         } else if (writingSystemPane.getSelectedIndex() == 3) {  // syllabary
             syllabaryCustomFontField.setText(fontname);
-            if(writingSystem.get("FontType").equals("borrowed")){
+            if (writingSystem.get("FontType").equals("borrowed")) {
                 syllabaryCustomFontCheck.setSelected(false);
             } else {
                 syllabaryCustomFontCheck.setSelected(true);
                 tcr2.setFontName(writingSystem.get("Font").toString());
-                visibleCharLabel.setFont(new Font(writingSystem.get("Font").toString(),Font.PLAIN,30));
+                visibleCharLabel.setFont(new Font(writingSystem.get("Font").toString(), Font.PLAIN, 30));
             }
-            vowels.add("NV");
-            consonants.add("NC");
-            HashMap syllables = (HashMap)writingSystem.get("Syllables");
+            vowls.add("NV");
+            consnts.add("NC");
+            HashMap syllables = (HashMap) writingSystem.get("Syllables");
             Object[] keys = syllables.keySet().toArray();
             Arrays.sort(keys);
-            Object[] vwls=vowls.toArray();
-            Object[] cnsnts=consnts.toArray();
+            Object[] vwls = vowls.toArray();
+            Object[] cnsnts = consnts.toArray();
             Arrays.sort(vwls, new LengthReverseComparator());
             Arrays.sort(cnsnts, new LengthReverseComparator());
-            for(int s=0; s < keys.length; s++){
+            for (int s = 0; s < keys.length; s++) {
                 String sylb = syllables.get(keys[s]).toString();
                 String key = keys[s].toString();
                 int vl = -1;
                 int cn = -1;
-                for(int c=0; c < cnsnts.length; c++){
-                    if(key.indexOf(cnsnts[c].toString())>=0){
-                        cn = consonants.indexOf(cnsnts[c].toString());
+                for (int c = 0; c < cnsnts.length; c++) {
+                    if (key.indexOf(cnsnts[c].toString()) >= 0) {
+                        cn = consnts.indexOf(cnsnts[c].toString());
                         break;
                     }
                 }
-                for(int v=0; v < vwls.length; v++){
-                    if(key.indexOf(vwls[v].toString())>=0){
-                        vl = vowels.indexOf(vwls[v].toString()) + 1;
+                for (int v = 0; v < vwls.length; v++) {
+                    if (key.indexOf(vwls[v].toString()) >= 0) {
+                        vl = vowls.indexOf(vwls[v].toString());
                         break;
                     }
                 }
-                dtm4.setValueAt(sylb, cn, vl);
+                dtm4.setValueAt(sylb, cn, vl + 1);
             }
 
         } else if (writingSystemPane.getSelectedIndex() == 4) {  // multigraphic
             multiCustomFontField.setText(fontname);
-            if(writingSystem.get("FontType").equals("borrowed")){
+            if (writingSystem.get("FontType").equals("borrowed")) {
                 multiBorrowedRadio.setSelected(true);
             } else {
                 multiCustomRadio.setSelected(true);
                 multiCustomFontField.setEnabled(true);
                 multiCustomFontField.setEditable(true);
                 multiChooseCustomFontButton.setEnabled(true);
-                tcr2.setFontName(writingSystem.get("Font")+"");
-                multiCharacterLabel.setFont(new Font(writingSystem.get("Font")+"",Font.PLAIN,30));
+                tcr2.setFontName(writingSystem.get("Font") + "");
+                multiCharacterLabel.setFont(new Font(writingSystem.get("Font") + "", Font.PLAIN, 30));
             }
             int pns = phonemes.size();
-            if(phonemes.containsKey("Enders")){
+            if (phonemes.containsKey("Enders")) {
                 multiUseEndersCheckbox.setSelected(true);
                 dtm3.setRowCount(dtm3.getRowCount() + 1);
-                pns --;
+                pns--;
             }
-            graphemesPerGlyphSpinner.setValue(Integer.parseInt(writingSystem.get("GraphemesPerGlyph")+""));
-            for(int a=0;a<pns;a++){
-                String[] z= (phonemes.get(ob[a])+"").split(" ");
-                for(int b = 0; b < z.length; b ++){
+            graphemesPerGlyphSpinner.setValue(Integer.parseInt(writingSystem.get("GraphemesPerGlyph") + ""));
+            for (int a = 0; a < pns; a++) {
+                String[] z = (phonemes.get(ob[a]) + "").split(" ");
+                for (int b = 0; b < z.length; b++) {
                     dtm3.setValueAt(z[b], a, b + 1);
                 }
             }
-            dtm3.setValueAt("Enders", dtm3.getRowCount()-1, 0);
-            String[] ends = (phonemes.get("Enders")+"").split(" ");
-            for (int a = 0; a < ends.length; a++){
-                dtm3.setValueAt(ends[a], dtm3.getRowCount()-1, a + 1);
+            dtm3.setValueAt("Enders", dtm3.getRowCount() - 1, 0);
+            String[] ends = (phonemes.get("Enders") + "").split(" ");
+            for (int a = 0; a < ends.length; a++) {
+                dtm3.setValueAt(ends[a], dtm3.getRowCount() - 1, a + 1);
             }
         }
-        HashMap punct = (HashMap)writingSystem.get("Punctuation");
+        HashMap punct = (HashMap) writingSystem.get("Punctuation");
         Object[] punctKeys = punct.keySet().toArray();
         Arrays.sort(punctKeys);
-        for (int p = 0; p < punctKeys.length; p++){
-            punctuationTable.setValueAt(punct.get(punctKeys[p]+""), p, 1);
+        for (int p = 0; p < punctKeys.length; p++) {
+            punctuationTable.setValueAt(punct.get(punctKeys[p] + ""), p, 1);
         }
-        punctCharacterLabel.setFont(new Font(writingSystem.get("Font")+"",1,20));
+        punctCharacterLabel.setFont(new Font(writingSystem.get("Font") + "", 1, 20));
         presets = new Vector();
         RwCellRenderer2 tcr3 = new RwCellRenderer2();
         tcr3.setFontName("LCS-ConstructorII");
@@ -314,27 +334,25 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
             BufferedReader in = new BufferedReader(new FileReader("./lcs-ws-presets.csv"));
             String s = in.readLine();
             dtm6.setRowCount(0);
-            String[] ss  = new String[4];
+            String[] ss = new String[4];
             int b = 0;
-            while(!(s = in.readLine()).equals("End,,,,,,,,,,,,")){
+            while (!(s = in.readLine()).equals("End,,,,,,,,,,,,")) {
                 String[] sar = s.split(",");
                 presets.add(sar);
                 b++;
-                ss[0] = b +"";
+                ss[0] = b + "";
                 ss[1] = sar[0];
                 ss[2] = sar[1];
-                int base = Integer.parseInt(sar[2],16);
+                int base = Integer.parseInt(sar[2], 16);
                 char q;
                 int cvalue = base;
                 ss[3] = rwHexStringConverter.convertFrom(sar[11]);
                 dtm6.addRow(ss);
             }
             in.close();
-        }
-        catch (FileNotFoundException ex){
+        } catch (FileNotFoundException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Oops!", JOptionPane.ERROR_MESSAGE);
-        }
-        catch (IOException ex){
+        } catch (IOException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Oops!", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -521,6 +539,12 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
         PresetsScroller = new javax.swing.JScrollPane();
         presetsTable = new javax.swing.JTable();
         useSystemButton = new javax.swing.JButton();
+        userDefdCard = new javax.swing.JPanel();
+        userDefdScroller = new javax.swing.JScrollPane();
+        userDefdTable = new javax.swing.JTable();
+        browse4WsButton = new javax.swing.JButton();
+        loadWsButton = new javax.swing.JButton();
+        saveWsButton = new javax.swing.JButton();
 
         tcr2.setText("rwCellRenderer21"); // NOI18N
 
@@ -1003,7 +1027,7 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
         gridBagConstraints.weighty = 0.1;
         alphabetCard.add(autofillAlphabetButton, gridBagConstraints);
 
-        directionalityButton.setFont(new java.awt.Font("LCS-ConstructorII", 0, 12)); // NOI18N
+        directionalityButton.setFont(new java.awt.Font("LCS-ConstructorII", 0, 12));
         directionalityButton.setText("L ➡ R");
         directionalityButton.setMargin(new java.awt.Insets(0, 2, 0, 2));
         directionalityButton.addActionListener(new java.awt.event.ActionListener() {
@@ -2728,17 +2752,82 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
 
             writingSystemPane.addTab("Presets", Presets);
 
+            userDefdTable.setModel(new javax.swing.table.DefaultTableModel(
+                new Object [][] {
+                    {null, null, null},
+                    {null, null, null},
+                    {null, null, null},
+                    {null, null, null}
+                },
+                new String [] {
+                    "Name", "Type", "Sample Text"
+                }
+            ));
+            userDefdTable.setRowHeight(30);
+            userDefdScroller.setViewportView(userDefdTable);
+
+            browse4WsButton.setText("Browse ...");
+            browse4WsButton.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    browse4WsButtonActionPerformed(evt);
+                }
+            });
+
+            javax.swing.GroupLayout userDefdCardLayout = new javax.swing.GroupLayout(userDefdCard);
+            userDefdCard.setLayout(userDefdCardLayout);
+            userDefdCardLayout.setHorizontalGroup(
+                userDefdCardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(userDefdCardLayout.createSequentialGroup()
+                    .addGroup(userDefdCardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(userDefdCardLayout.createSequentialGroup()
+                            .addContainerGap()
+                            .addComponent(userDefdScroller, javax.swing.GroupLayout.DEFAULT_SIZE, 578, Short.MAX_VALUE))
+                        .addGroup(userDefdCardLayout.createSequentialGroup()
+                            .addGap(249, 249, 249)
+                            .addComponent(browse4WsButton)))
+                    .addContainerGap())
+            );
+            userDefdCardLayout.setVerticalGroup(
+                userDefdCardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(userDefdCardLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(userDefdScroller, javax.swing.GroupLayout.PREFERRED_SIZE, 287, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(18, 18, 18)
+                    .addComponent(browse4WsButton)
+                    .addContainerGap(42, Short.MAX_VALUE))
+            );
+
+            writingSystemPane.addTab("User Defined", userDefdCard);
+
+            loadWsButton.setText("Load ...");
+            loadWsButton.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    loadWsButtonActionPerformed(evt);
+                }
+            });
+
+            saveWsButton.setText("Save As ...");
+            saveWsButton.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    saveWsButtonActionPerformed(evt);
+                }
+            });
+
             javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
             getContentPane().setLayout(layout);
             layout.setHorizontalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
                     .addContainerGap()
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addComponent(writingSystemPane, javax.swing.GroupLayout.PREFERRED_SIZE, 603, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGroup(layout.createSequentialGroup()
                             .addComponent(okButton)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 493, Short.MAX_VALUE)
+                            .addGap(67, 67, 67)
+                            .addComponent(loadWsButton)
+                            .addGap(34, 34, 34)
+                            .addComponent(saveWsButton)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(cancelButton)))
                     .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             );
@@ -2750,7 +2839,9 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(okButton)
-                        .addComponent(cancelButton))
+                        .addComponent(cancelButton)
+                        .addComponent(loadWsButton)
+                        .addComponent(saveWsButton))
                     .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             );
 
@@ -2765,8 +2856,9 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
     private void syllabaryDownCharButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_syllabaryDownCharButtonActionPerformed
         int c = visibleCharLabel.getText().codePointAt(2);
         --c;
-        if (c < 32)
+        if (c < 32) {
             c = 32;
+        }
         updateSyllabaryChar(c);
     }//GEN-LAST:event_syllabaryDownCharButtonActionPerformed
 
@@ -2787,19 +2879,20 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
         int cs = 0;
         boolean punctSet = true;
-        if(punctuationTable.getValueAt(0, 1)==null){
+        if (punctuationTable.getValueAt(0, 1) == null) {
             JOptionPane jop = new JOptionPane();
             cs = jop.showConfirmDialog(this, "Punctuation is not set.\nDo you wish to set it?", "Oops!", JOptionPane.INFORMATION_MESSAGE);
             punctSet = false;
         }
-        if (punctSet == true){
+        if (punctSet == true) {
             this.setVisible(false);
-            chosenOption=OK_OPTION;
+            System.out.println(writingSystem);
+            chosenOption = OK_OPTION;
             punctuationSet = true;
         }
-        if(cs == JOptionPane.NO_OPTION && punctSet == false){
+        if (cs == JOptionPane.NO_OPTION && punctSet == false) {
             this.setVisible(false);
-            chosenOption=OK_OPTION;
+            chosenOption = OK_OPTION;
         }
 
     }//GEN-LAST:event_okButtonActionPerformed
@@ -2808,10 +2901,10 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
         RwJFontChooser rwf = new RwJFontChooser(new JFrame());
         rwf.setVisible(true);
         Font daFont = rwf.getSelectedFont();
-        if(daFont != null){
+        if (daFont != null) {
             fontField.setText(daFont.getFontName());
             tcr2.setFontName(daFont.getFontName());
-            for(int a=0;a<alphaTable.getRowCount();a++){
+            for (int a = 0; a < alphaTable.getRowCount(); a++) {
                 alphaTable.setValueAt(alphaTable.getValueAt(a, 0), a, 1);
             }
             characterLabel.setFont(daFont);
@@ -2823,12 +2916,12 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
         RwJFontChooser rwf = new RwJFontChooser(new JFrame());
         rwf.setVisible(true);
         Font daFont = rwf.getSelectedFont();
-        if (daFont != null){
+        if (daFont != null) {
             syllabaryCustomFontField.setText(daFont.getFontName());
             visibleCharLabel.setFont(daFont);
             punctCharacterLabel.setFont(daFont);
             RwCellRenderer2 rcr = new RwCellRenderer2(daFont);
-            for(int a=0; a< syllabaryTable.getColumnCount();a++){
+            for (int a = 0; a < syllabaryTable.getColumnCount(); a++) {
                 syllabaryTable.getColumnModel().getColumn(a).setCellRenderer(rcr);
             }
         }
@@ -2849,8 +2942,9 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
     private void syllabaryDownPageButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_syllabaryDownPageButtonActionPerformed
         int c = visibleCharLabel.getText().codePointAt(2);
         c = c - 256;
-        if (c < 32)
+        if (c < 32) {
             c = 32;
+        }
         updateSyllabaryChar(c);
     }//GEN-LAST:event_syllabaryDownPageButtonActionPerformed
 
@@ -2862,19 +2956,19 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
 
     private void jumpToFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jumpToFieldActionPerformed
         String jumpTo = jumpToField.getText();
-        int loc = Integer.parseInt(jumpTo,16);
+        int loc = Integer.parseInt(jumpTo, 16);
         updateSyllabaryChar(loc);
     }//GEN-LAST:event_jumpToFieldActionPerformed
 
     private void autoFillSyllabaryButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoFillSyllabaryButtonActionPerformed
         Object o = syllabaryTable.getValueAt(0, 1);
-        if (o == null){
-            JOptionPane.showMessageDialog(this, "Cannot start with null!","Oops!",JOptionPane.ERROR_MESSAGE);
+        if (o == null) {
+            JOptionPane.showMessageDialog(this, "Cannot start with null!", "Oops!", JOptionPane.ERROR_MESSAGE);
         } else {
-            String s = o+"";
+            String s = o + "";
             int c = s.codePointAt(0);
-            for (int row = 0; row < syllabaryTable.getRowCount(); row++){
-                for (int col = 1; col < syllabaryTable.getColumnCount(); col++){
+            for (int row = 0; row < syllabaryTable.getRowCount(); row++) {
+                for (int col = 1; col < syllabaryTable.getColumnCount(); col++) {
                     syllabaryTable.setValueAt(new String(Character.toChars(c)), row, col);
                     c++;
                 }
@@ -2883,22 +2977,22 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
     }//GEN-LAST:event_autoFillSyllabaryButtonActionPerformed
 
     private void upCharAbjadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_upCharAbjadButtonActionPerformed
-        int selRow=abjadTable.getSelectedRow();
-        if(selRow-1 >= 0){
-            abjadTable.setRowSelectionInterval(selRow-1, selRow-1);
-            abjadTable.scrollRectToVisible(abjadTable.getCellRect(selRow-1, 0, true));
+        int selRow = abjadTable.getSelectedRow();
+        if (selRow - 1 >= 0) {
+            abjadTable.setRowSelectionInterval(selRow - 1, selRow - 1);
+            abjadTable.scrollRectToVisible(abjadTable.getCellRect(selRow - 1, 0, true));
         } else {
-            selRow = abjadTable.getRowCount()-1;
+            selRow = abjadTable.getRowCount() - 1;
             abjadTable.setRowSelectionInterval(selRow, selRow);
             abjadTable.scrollRectToVisible(abjadTable.getCellRect(selRow, 0, true));
         }
     }//GEN-LAST:event_upCharAbjadButtonActionPerformed
 
     private void downCharAbjadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downCharAbjadButtonActionPerformed
-        int selRow=abjadTable.getSelectedRow();
-        if(selRow+1 < abjadTable.getRowCount()){
-            abjadTable.setRowSelectionInterval(selRow+1, selRow+1);
-            abjadTable.scrollRectToVisible(abjadTable.getCellRect(selRow+1, 0, true));
+        int selRow = abjadTable.getSelectedRow();
+        if (selRow + 1 < abjadTable.getRowCount()) {
+            abjadTable.setRowSelectionInterval(selRow + 1, selRow + 1);
+            abjadTable.scrollRectToVisible(abjadTable.getCellRect(selRow + 1, 0, true));
         } else {
             selRow = 0;
             abjadTable.setRowSelectionInterval(selRow, selRow);
@@ -2907,30 +3001,32 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
     }//GEN-LAST:event_downCharAbjadButtonActionPerformed
 
     private void downPageAbjadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downPageAbjadButtonActionPerformed
-        int c=abjadCharLabel.getText().codePointAt(2);
-        c-=256;
-        if(c<20)
-            c=20;
+        int c = abjadCharLabel.getText().codePointAt(2);
+        c -= 256;
+        if (c < 20) {
+            c = 20;
+        }
         updateAbjadChar(c);
     }//GEN-LAST:event_downPageAbjadButtonActionPerformed
 
     private void downAbjadCharButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downAbjadCharButtonActionPerformed
-        int c=abjadCharLabel.getText().codePointAt(2);
+        int c = abjadCharLabel.getText().codePointAt(2);
         c--;
-        if(c<32)
-            c=32;
+        if (c < 32) {
+            c = 32;
+        }
         updateAbjadChar(c);
     }//GEN-LAST:event_downAbjadCharButtonActionPerformed
 
     private void upAbjadCharButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_upAbjadCharButtonActionPerformed
-        int c=abjadCharLabel.getText().codePointAt(2);
+        int c = abjadCharLabel.getText().codePointAt(2);
         c++;
         updateAbjadChar(c);
     }//GEN-LAST:event_upAbjadCharButtonActionPerformed
 
     private void upAbjadPageButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_upAbjadPageButtonActionPerformed
-        int c=abjadCharLabel.getText().codePointAt(2);
-        c+=256;
+        int c = abjadCharLabel.getText().codePointAt(2);
+        c += 256;
         updateAbjadChar(c);
     }//GEN-LAST:event_upAbjadPageButtonActionPerformed
 
@@ -2940,22 +3036,22 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
     }//GEN-LAST:event_abugidaCustomFontRadioActionPerformed
 
     private void upCharButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_upCharButtonActionPerformed
-        int selRow=alphaTable.getSelectedRow();
-        if(selRow-1 >= 0){
-            alphaTable.setRowSelectionInterval(selRow-1, selRow-1);
-            alphaTable.scrollRectToVisible(alphaTable.getCellRect(selRow-1, 0, true));
+        int selRow = alphaTable.getSelectedRow();
+        if (selRow - 1 >= 0) {
+            alphaTable.setRowSelectionInterval(selRow - 1, selRow - 1);
+            alphaTable.scrollRectToVisible(alphaTable.getCellRect(selRow - 1, 0, true));
         } else {
-            selRow = alphaTable.getRowCount()-1;
+            selRow = alphaTable.getRowCount() - 1;
             alphaTable.setRowSelectionInterval(selRow, selRow);
             alphaTable.scrollRectToVisible(alphaTable.getCellRect(selRow, 0, true));
         }
     }//GEN-LAST:event_upCharButtonActionPerformed
 
     private void downCharButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downCharButtonActionPerformed
-        int selRow=alphaTable.getSelectedRow();
-        if(selRow+1 < alphaTable.getRowCount()){
-            alphaTable.setRowSelectionInterval(selRow+1, selRow+1);
-            alphaTable.scrollRectToVisible(alphaTable.getCellRect(selRow+1, 0, true));
+        int selRow = alphaTable.getSelectedRow();
+        if (selRow + 1 < alphaTable.getRowCount()) {
+            alphaTable.setRowSelectionInterval(selRow + 1, selRow + 1);
+            alphaTable.scrollRectToVisible(alphaTable.getCellRect(selRow + 1, 0, true));
         } else {
             selRow = 0;
             alphaTable.setRowSelectionInterval(selRow, selRow);
@@ -2964,47 +3060,48 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
     }//GEN-LAST:event_downCharButtonActionPerformed
 
     private void downButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downButtonActionPerformed
-        int c=characterLabel.getText().codePointAt(2);
+        int c = characterLabel.getText().codePointAt(2);
         c--;
-        if(c<32)
-            c=32;
+        if (c < 32) {
+            c = 32;
+        }
         updateAlphaChar(c);
     }//GEN-LAST:event_downButtonActionPerformed
 
     private void upButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_upButtonActionPerformed
-        int c=characterLabel.getText().codePointAt(2);
+        int c = characterLabel.getText().codePointAt(2);
         c++;
         updateAlphaChar(c);
     }//GEN-LAST:event_upButtonActionPerformed
 
     private void downPageButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downPageButtonActionPerformed
-        int c=characterLabel.getText().codePointAt(2);
-        c-=256;
-        if(c<32)
-            c=32;
+        int c = characterLabel.getText().codePointAt(2);
+        c -= 256;
+        if (c < 32) {
+            c = 32;
+        }
         updateAlphaChar(c);
     }//GEN-LAST:event_downPageButtonActionPerformed
 
     private void upPageButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_upPageButtonActionPerformed
-        int c=characterLabel.getText().codePointAt(2);
-        c+=256;
+        int c = characterLabel.getText().codePointAt(2);
+        c += 256;
         updateAlphaChar(c);
     }//GEN-LAST:event_upPageButtonActionPerformed
 
     private void alphaJumpToFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_alphaJumpToFieldActionPerformed
-        int v = (int)Integer.parseInt(alphaJumpToField.getText(),16);
+        int v = (int) Integer.parseInt(alphaJumpToField.getText(), 16);
         updateAlphaChar(v);
     }//GEN-LAST:event_alphaJumpToFieldActionPerformed
 
     private void setAlphaCharButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setAlphaCharButtonActionPerformed
-        if(alphaTable.getSelectedColumn() < 1){
-            alphaTable.setColumnSelectionInterval(1,1);
+        if (alphaTable.getSelectedColumn() < 1) {
+            alphaTable.setColumnSelectionInterval(1, 1);
         }
-        try{
+        try {
             int v = characterLabel.getText().codePointAt(2);
             alphaTable.setValueAt(new String(Character.toChars(v)), alphaTable.getSelectedRow(), alphaTable.getSelectedColumn());
-        }
-        catch (IndexOutOfBoundsException ex){
+        } catch (IndexOutOfBoundsException ex) {
             JOptionPane.showMessageDialog(this, "Please choose a place to set it!", null,
                     JOptionPane.ERROR_MESSAGE);
         }
@@ -3014,10 +3111,10 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
         RwJFontChooser rwf = new RwJFontChooser(new JFrame());
         rwf.setVisible(true);
         Font daFont = rwf.getSelectedFont();
-        if (daFont != null){
+        if (daFont != null) {
             abjadFontField.setText(daFont.getFontName());
             tcr2.setFontName(daFont.getFontName());
-            for(int a=0;a<abjadTable.getRowCount();a++){
+            for (int a = 0; a < abjadTable.getRowCount(); a++) {
                 abjadTable.setValueAt(abjadTable.getValueAt(a, 0), a, 1);
             }
             abjadCharLabel.setFont(daFont);
@@ -3026,20 +3123,20 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
     }//GEN-LAST:event_chooseAbjadFontButtonActionPerformed
 
     private void autofillAlphabetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autofillAlphabetButtonActionPerformed
-        if(alphaTable.getSelectedColumn()<1){
+        if (alphaTable.getSelectedColumn() < 1) {
             alphaTable.setColumnSelectionInterval(1, 1);
         }
         Object[] o = new Object[alphaTable.getColumnCount()];
-        for(int z=0; z<alphaTable.getColumnCount(); z++){
+        for (int z = 0; z < alphaTable.getColumnCount(); z++) {
             o[z] = alphaTable.getValueAt(0, z);
         }
-        if (o[0] == null){
-            JOptionPane.showMessageDialog(this, "Cannot start with null!", "Oops!",JOptionPane.ERROR_MESSAGE);
+        if (o[0] == null) {
+            JOptionPane.showMessageDialog(this, "Cannot start with null!", "Oops!", JOptionPane.ERROR_MESSAGE);
         } else {
-            for (int z=1; z<alphaTable.getColumnCount(); z++){
-                String s = o[z]+"";
+            for (int z = 1; z < alphaTable.getColumnCount(); z++) {
+                String s = o[z] + "";
                 int c = s.codePointAt(0);
-                for (int row = 0; row < alphaTable.getRowCount(); row++){
+                for (int row = 0; row < alphaTable.getRowCount(); row++) {
                     alphaTable.setValueAt(new String(Character.toChars(c)), row, z);
                     c++;
                 }
@@ -3048,20 +3145,20 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
     }//GEN-LAST:event_autofillAlphabetButtonActionPerformed
 
     private void autofillAbjadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autofillAbjadButtonActionPerformed
-        if(abjadTable.getSelectedColumn()<1){
+        if (abjadTable.getSelectedColumn() < 1) {
             abjadTable.setColumnSelectionInterval(1, 1);
         }
         Object[] o = new Object[abjadTable.getColumnCount()];
-        for(int z=0; z<abjadTable.getColumnCount(); z++){
+        for (int z = 0; z < abjadTable.getColumnCount(); z++) {
             o[z] = abjadTable.getValueAt(0, z);
         }
-        if (o[0] == null){
-            JOptionPane.showMessageDialog(this, "Cannot start with null!","Oops!",JOptionPane.ERROR_MESSAGE);
+        if (o[0] == null) {
+            JOptionPane.showMessageDialog(this, "Cannot start with null!", "Oops!", JOptionPane.ERROR_MESSAGE);
         } else {
-            for (int z=1; z<abjadTable.getColumnCount(); z++){
-                String s = o[z]+"";
+            for (int z = 1; z < abjadTable.getColumnCount(); z++) {
+                String s = o[z] + "";
                 int c = s.codePointAt(0);
-                for (int row = 0; row < abjadTable.getRowCount(); row++){
+                for (int row = 0; row < abjadTable.getRowCount(); row++) {
                     abjadTable.setValueAt(new String(Character.toChars(c)), row, z);
                     c++;
                 }
@@ -3070,14 +3167,13 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
     }//GEN-LAST:event_autofillAbjadButtonActionPerformed
 
     private void setAbjadCharButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setAbjadCharButtonActionPerformed
-        if(abjadTable.getSelectedColumn()<1){
-            abjadTable.setColumnSelectionInterval(1,1);
+        if (abjadTable.getSelectedColumn() < 1) {
+            abjadTable.setColumnSelectionInterval(1, 1);
         }
-        try{
+        try {
             int v = abjadCharLabel.getText().codePointAt(2);
             abjadTable.setValueAt(new String(Character.toChars(v)), abjadTable.getSelectedRow(), abjadTable.getSelectedColumn());
-        }
-        catch (IndexOutOfBoundsException ex){
+        } catch (IndexOutOfBoundsException ex) {
             JOptionPane.showMessageDialog(this, "Please choose a place to set it!", null,
                     JOptionPane.ERROR_MESSAGE);
         }
@@ -3085,7 +3181,7 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
 
     private void abjadJumpToFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_abjadJumpToFieldActionPerformed
         String jumpTo = abjadJumpToField.getText();
-        int loc = Integer.parseInt(jumpTo,16);
+        int loc = Integer.parseInt(jumpTo, 16);
         updateAbjadChar(loc);
     }//GEN-LAST:event_abjadJumpToFieldActionPerformed
 
@@ -3103,36 +3199,36 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
         RwJFontChooser rwf = new RwJFontChooser(new JFrame());
         rwf.setVisible(true);
         Font daFont = rwf.getSelectedFont();
-        if(daFont != null){
+        if (daFont != null) {
             abugidaFontField.setText(daFont.getFontName());
             tcr2.setFontName(daFont.getFontName());
-            for(int a=0;a<abugidaTable.getRowCount();a++){
-                if(abugidaTable.getValueAt(a, 1) == null){
+            for (int a = 0; a < abugidaTable.getRowCount(); a++) {
+                if (abugidaTable.getValueAt(a, 1) == null) {
                     abugidaTable.setValueAt(abugidaTable.getValueAt(a, 0), a, 1);
                 }
             }
-        abugidaCharLabel.setFont(daFont);
-        punctCharacterLabel.setFont(daFont);
+            abugidaCharLabel.setFont(daFont);
+            punctCharacterLabel.setFont(daFont);
         }
     }//GEN-LAST:event_abugidaChooseFontButtonActionPerformed
 
     private void abugidaUpCharButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_abugidaUpCharButtonActionPerformed
-        int selRow=abugidaTable.getSelectedRow();
-        if(selRow-1 >= 0){
-            abugidaTable.setRowSelectionInterval(selRow-1, selRow-1);
-            abugidaTable.scrollRectToVisible(abugidaTable.getCellRect(selRow-1, 0, true));
+        int selRow = abugidaTable.getSelectedRow();
+        if (selRow - 1 >= 0) {
+            abugidaTable.setRowSelectionInterval(selRow - 1, selRow - 1);
+            abugidaTable.scrollRectToVisible(abugidaTable.getCellRect(selRow - 1, 0, true));
         } else {
-            selRow = abugidaTable.getRowCount()-1;
+            selRow = abugidaTable.getRowCount() - 1;
             abugidaTable.setRowSelectionInterval(selRow, selRow);
             abugidaTable.scrollRectToVisible(abugidaTable.getCellRect(selRow, 0, true));
         }
     }//GEN-LAST:event_abugidaUpCharButtonActionPerformed
 
     private void abugidaDownCharButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_abugidaDownCharButtonActionPerformed
-        int selRow=abugidaTable.getSelectedRow();
-        if(selRow+1 < abugidaTable.getRowCount()){
-            abugidaTable.setRowSelectionInterval(selRow+1, selRow+1);
-            abugidaTable.scrollRectToVisible(abugidaTable.getCellRect(selRow+1, 0, true));
+        int selRow = abugidaTable.getSelectedRow();
+        if (selRow + 1 < abugidaTable.getRowCount()) {
+            abugidaTable.setRowSelectionInterval(selRow + 1, selRow + 1);
+            abugidaTable.scrollRectToVisible(abugidaTable.getCellRect(selRow + 1, 0, true));
         } else {
             selRow = 0;
             abugidaTable.setRowSelectionInterval(selRow, selRow);
@@ -3141,52 +3237,53 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
     }//GEN-LAST:event_abugidaDownCharButtonActionPerformed
 
     private void setAbugidaCharButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setAbugidaCharButtonActionPerformed
-        try{
+        try {
             int v = abugidaCharLabel.getText().codePointAt(2);
             abugidaTable.setValueAt(new String(Character.toChars(v)), abugidaTable.getSelectedRow(), 1);
-        }
-        catch (IndexOutOfBoundsException ex){
+        } catch (IndexOutOfBoundsException ex) {
             JOptionPane.showMessageDialog(this, "Please choose a place to set it!", null,
                     JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_setAbugidaCharButtonActionPerformed
 
     private void downPageAbugidaButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downPageAbugidaButtonActionPerformed
-        int c=abugidaCharLabel.getText().codePointAt(2);
-        c-=256;
-        if(c<32)
-            c=32;
+        int c = abugidaCharLabel.getText().codePointAt(2);
+        c -= 256;
+        if (c < 32) {
+            c = 32;
+        }
         updateAbugidaChar(c);
     }//GEN-LAST:event_downPageAbugidaButtonActionPerformed
 
     private void downCharAbugidaButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downCharAbugidaButtonActionPerformed
-        int c=abugidaCharLabel.getText().codePointAt(2);
+        int c = abugidaCharLabel.getText().codePointAt(2);
         c--;
-        if(c<32)
-            c=32;
+        if (c < 32) {
+            c = 32;
+        }
         updateAbugidaChar(c);
     }//GEN-LAST:event_downCharAbugidaButtonActionPerformed
 
     private void upCharAbugidaButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_upCharAbugidaButtonActionPerformed
-        int c=abugidaCharLabel.getText().codePointAt(2);
+        int c = abugidaCharLabel.getText().codePointAt(2);
         c++;
         updateAbugidaChar(c);
     }//GEN-LAST:event_upCharAbugidaButtonActionPerformed
 
     private void upPageAbugidaButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_upPageAbugidaButtonActionPerformed
-        int c=abugidaCharLabel.getText().codePointAt(2);
-        c+=256;
+        int c = abugidaCharLabel.getText().codePointAt(2);
+        c += 256;
         updateAbugidaChar(c);
     }//GEN-LAST:event_upPageAbugidaButtonActionPerformed
 
     private void abugidaAutoFillButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_abugidaAutoFillButtonActionPerformed
         Object o = abugidaTable.getValueAt(0, 1);
-        if (o == null){
-            JOptionPane.showMessageDialog(this, "Cannot start with null!", "Oops!",JOptionPane.ERROR_MESSAGE);
+        if (o == null) {
+            JOptionPane.showMessageDialog(this, "Cannot start with null!", "Oops!", JOptionPane.ERROR_MESSAGE);
         } else {
-            String s = o+"";
+            String s = o + "";
             int c = s.codePointAt(0);
-            for (int row = 0; row < abugidaTable.getRowCount(); row++){
+            for (int row = 0; row < abugidaTable.getRowCount(); row++) {
                 abugidaTable.setValueAt(new String(Character.toChars(c)), row, 1);
                 c++;
             }
@@ -3194,7 +3291,7 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
     }//GEN-LAST:event_abugidaAutoFillButtonActionPerformed
 
     private void abugidaJumpToFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_abugidaJumpToFieldActionPerformed
-        int v = Integer.parseInt(abugidaJumpToField.getText(),16);
+        int v = Integer.parseInt(abugidaJumpToField.getText(), 16);
         updateAbugidaChar(v);
     }//GEN-LAST:event_abugidaJumpToFieldActionPerformed
 
@@ -3204,47 +3301,47 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
     }//GEN-LAST:event_abugidaBorrowedFontRadioActionPerformed
 
     private void alphaGlyphsPerLetterSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_alphaGlyphsPerLetterSpinnerStateChanged
-        int numberOfGlyphs = ((Integer)alphaGlyphsPerLetterSpinner.getValue()).intValue();
-        if (numberOfGlyphs > 1){
+        int numberOfGlyphs = ((Integer) alphaGlyphsPerLetterSpinner.getValue()).intValue();
+        if (numberOfGlyphs > 1) {
             alphaLetterGlyphNumberCombo.setEnabled(true);
             alphaLetterUsedInCombo.setEnabled(true);
             alphaLeftColumnButton.setEnabled(true);
             alphaRightColumnButton.setEnabled(true);
-        }else{
+        } else {
             alphaLetterGlyphNumberCombo.setEnabled(false);
             alphaLetterUsedInCombo.setEnabled(false);
             alphaLeftColumnButton.setEnabled(false);
             alphaRightColumnButton.setEnabled(false);
         }
-        if(alphaTable.getColumnCount()!= numberOfGlyphs +1){
-            DefaultTableModel defMod = (DefaultTableModel)alphaTable.getModel();
+        if (alphaTable.getColumnCount() != numberOfGlyphs + 1) {
+            DefaultTableModel defMod = (DefaultTableModel) alphaTable.getModel();
             defMod.setColumnCount(2);
-            for(int a=1;a<numberOfGlyphs;a++){
-                defMod.addColumn("Glyph "+ (a+1));
+            for (int a = 1; a < numberOfGlyphs; a++) {
+                defMod.addColumn("Glyph " + (a + 1));
             }
-            for(int a=0;a<=numberOfGlyphs;a++){
+            for (int a = 0; a <= numberOfGlyphs; a++) {
                 alphaTable.getColumnModel().getColumn(a).setCellRenderer(tcr2);
             }
         }
     }//GEN-LAST:event_alphaGlyphsPerLetterSpinnerStateChanged
 
     private void alphaLeftColumnButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_alphaLeftColumnButtonActionPerformed
-        if(alphaTable.getSelectedColumn()<1){
+        if (alphaTable.getSelectedColumn() < 1) {
             alphaTable.setColumnSelectionInterval(1, 1);
         }
         System.out.println(alphaTable.getSelectedColumn());
-        if(alphaTable.getSelectedColumn()>1){
-            alphaTable.setColumnSelectionInterval(alphaTable.getSelectedColumn()-1,alphaTable.getSelectedColumn()-1);
+        if (alphaTable.getSelectedColumn() > 1) {
+            alphaTable.setColumnSelectionInterval(alphaTable.getSelectedColumn() - 1, alphaTable.getSelectedColumn() - 1);
         }
     }//GEN-LAST:event_alphaLeftColumnButtonActionPerformed
 
     private void alphaRightColumnButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_alphaRightColumnButtonActionPerformed
-        if(alphaTable.getSelectedColumn()<1){
+        if (alphaTable.getSelectedColumn() < 1) {
             alphaTable.setColumnSelectionInterval(1, 1);
         }
         System.out.println(alphaTable.getSelectedColumn());
-        if(alphaTable.getSelectedColumn()<alphaTable.getColumnCount()-1){
-            alphaTable.setColumnSelectionInterval(alphaTable.getSelectedColumn()+1,alphaTable.getSelectedColumn()+1);
+        if (alphaTable.getSelectedColumn() < alphaTable.getColumnCount() - 1) {
+            alphaTable.setColumnSelectionInterval(alphaTable.getSelectedColumn() + 1, alphaTable.getSelectedColumn() + 1);
         }
     }//GEN-LAST:event_alphaRightColumnButtonActionPerformed
 
@@ -3253,10 +3350,10 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
     }//GEN-LAST:event_alphaLetterGlyphNumberComboActionPerformed
 
     private void alphaLetterUsedInComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_alphaLetterUsedInComboActionPerformed
-        String g1 = (String)alphaLetterGlyphNumberCombo.getSelectedItem();
-        String use = (String)alphaLetterUsedInCombo.getSelectedItem();
-        alphaGlyphUseMap.put(g1,use);
-        if (alphaGlyphUseMap.containsValue("Upper")){
+        String g1 = (String) alphaLetterGlyphNumberCombo.getSelectedItem();
+        String use = (String) alphaLetterUsedInCombo.getSelectedItem();
+        alphaGlyphUseMap.put(g1, use);
+        if (alphaGlyphUseMap.containsValue("Upper")) {
             capitalizationCombo.setEnabled(true);
         } else {
             capitalizationCombo.setEnabled(false);
@@ -3265,52 +3362,52 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
     }//GEN-LAST:event_alphaLetterUsedInComboActionPerformed
 
     private void abjadLeftColumnButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_abjadLeftColumnButtonActionPerformed
-        if(abjadTable.getSelectedColumn()<1){
+        if (abjadTable.getSelectedColumn() < 1) {
             abjadTable.setColumnSelectionInterval(1, 1);
         }
-        if(abjadTable.getSelectedColumn()>1){
-            abjadTable.setColumnSelectionInterval(abjadTable.getSelectedColumn()-1,abjadTable.getSelectedColumn()-1);
+        if (abjadTable.getSelectedColumn() > 1) {
+            abjadTable.setColumnSelectionInterval(abjadTable.getSelectedColumn() - 1, abjadTable.getSelectedColumn() - 1);
         }
     }//GEN-LAST:event_abjadLeftColumnButtonActionPerformed
 
     private void abjadRightColumnButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_abjadRightColumnButtonActionPerformed
-        if(abjadTable.getSelectedColumn()<1){
+        if (abjadTable.getSelectedColumn() < 1) {
             abjadTable.setColumnSelectionInterval(1, 1);
         }
-        if(abjadTable.getSelectedColumn()<abjadTable.getColumnCount()-1){
-            abjadTable.setColumnSelectionInterval(abjadTable.getSelectedColumn()+1,abjadTable.getSelectedColumn()+1);
+        if (abjadTable.getSelectedColumn() < abjadTable.getColumnCount() - 1) {
+            abjadTable.setColumnSelectionInterval(abjadTable.getSelectedColumn() + 1, abjadTable.getSelectedColumn() + 1);
         }
     }//GEN-LAST:event_abjadRightColumnButtonActionPerformed
 
     private void abjadGlyphsPerConsonantSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_abjadGlyphsPerConsonantSpinnerStateChanged
-        int numberOfGlyphs = ((Integer)abjadGlyphsPerConsonantSpinner.getValue()).intValue();
-        if (numberOfGlyphs > 1){
+        int numberOfGlyphs = ((Integer) abjadGlyphsPerConsonantSpinner.getValue()).intValue();
+        if (numberOfGlyphs > 1) {
             abjadConsonantGlyphNumberCombo.setEnabled(true);
             abjadConsonantUsedInCombo.setEnabled(true);
             abjadLeftColumnButton.setEnabled(true);
             abjadRightColumnButton.setEnabled(true);
-        }else{
+        } else {
             abjadConsonantGlyphNumberCombo.setEnabled(false);
             abjadConsonantUsedInCombo.setEnabled(false);
             abjadLeftColumnButton.setEnabled(false);
             abjadRightColumnButton.setEnabled(false);
         }
-        if(abjadTable.getColumnCount()!= numberOfGlyphs +1){
-            DefaultTableModel defMod = (DefaultTableModel)abjadTable.getModel();
+        if (abjadTable.getColumnCount() != numberOfGlyphs + 1) {
+            DefaultTableModel defMod = (DefaultTableModel) abjadTable.getModel();
             defMod.setColumnCount(2);
-            for(int a=1;a<numberOfGlyphs;a++){
-                defMod.addColumn("Glyph "+ (a+1));
+            for (int a = 1; a < numberOfGlyphs; a++) {
+                defMod.addColumn("Glyph " + (a + 1));
             }
-            for(int a = 0;a<=numberOfGlyphs;a++){
+            for (int a = 0; a <= numberOfGlyphs; a++) {
                 abjadTable.getColumnModel().getColumn(a).setCellRenderer(tcr2);
             }
         }
     }//GEN-LAST:event_abjadGlyphsPerConsonantSpinnerStateChanged
 
     private void abjadConsonantUsedInComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_abjadConsonantUsedInComboActionPerformed
-        String g1 = (String)abjadConsonantGlyphNumberCombo.getSelectedItem();
-        String use = (String)abjadConsonantUsedInCombo.getSelectedItem();
-        abjadGlyphUseMap.put(g1,use);
+        String g1 = (String) abjadConsonantGlyphNumberCombo.getSelectedItem();
+        String use = (String) abjadConsonantUsedInCombo.getSelectedItem();
+        abjadGlyphUseMap.put(g1, use);
         System.out.println(abjadGlyphUseMap);
     }//GEN-LAST:event_abjadConsonantUsedInComboActionPerformed
 
@@ -3323,22 +3420,22 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
     }//GEN-LAST:event_multiCustomFontFieldActionPerformed
 
     private void multiUpGlyphButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_multiUpGlyphButtonActionPerformed
-        int selRow=multigraphicTable.getSelectedRow();
-        if(selRow-1 >= 0){
-            multigraphicTable.setRowSelectionInterval(selRow-1, selRow-1);
-            multigraphicTable.scrollRectToVisible(multigraphicTable.getCellRect(selRow-1, 0, true));
+        int selRow = multigraphicTable.getSelectedRow();
+        if (selRow - 1 >= 0) {
+            multigraphicTable.setRowSelectionInterval(selRow - 1, selRow - 1);
+            multigraphicTable.scrollRectToVisible(multigraphicTable.getCellRect(selRow - 1, 0, true));
         } else {
-            selRow = multigraphicTable.getRowCount()-1;
+            selRow = multigraphicTable.getRowCount() - 1;
             multigraphicTable.setRowSelectionInterval(selRow, selRow);
             multigraphicTable.scrollRectToVisible(multigraphicTable.getCellRect(selRow, 0, true));
         }
     }//GEN-LAST:event_multiUpGlyphButtonActionPerformed
 
     private void multiDownButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_multiDownButtonActionPerformed
-        int selRow=multigraphicTable.getSelectedRow();
-        if(selRow+1 < multigraphicTable.getRowCount()){
-            multigraphicTable.setRowSelectionInterval(selRow+1, selRow+1);
-            multigraphicTable.scrollRectToVisible(multigraphicTable.getCellRect(selRow+1, 0, true));
+        int selRow = multigraphicTable.getSelectedRow();
+        if (selRow + 1 < multigraphicTable.getRowCount()) {
+            multigraphicTable.setRowSelectionInterval(selRow + 1, selRow + 1);
+            multigraphicTable.scrollRectToVisible(multigraphicTable.getCellRect(selRow + 1, 0, true));
         } else {
             selRow = 0;
             multigraphicTable.setRowSelectionInterval(selRow, selRow);
@@ -3352,10 +3449,11 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
     }//GEN-LAST:event_multiBorrowedRadioActionPerformed
 
     private void multiDownPageButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_multiDownPageButtonActionPerformed
-        int c=multiCharacterLabel.getText().codePointAt(2);
-        c-=256;
-        if(c<32)
-            c=32;
+        int c = multiCharacterLabel.getText().codePointAt(2);
+        c -= 256;
+        if (c < 32) {
+            c = 32;
+        }
         updateMultiChar(c);
     }//GEN-LAST:event_multiDownPageButtonActionPerformed
 
@@ -3368,13 +3466,13 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
         RwJFontChooser rwf = new RwJFontChooser(new JFrame());
         rwf.setVisible(true);
         Font daFont = rwf.getSelectedFont();
-        if(daFont != null){
+        if (daFont != null) {
             multiCustomFontField.setText(daFont.getFontName());
             tcr2.setFontName(daFont.getFontName());
-            for(int b = 1; b < multigraphicTable.getColumnCount(); b++){
-                char q = (multigraphicTable.getValueAt(0, b)+"").charAt(0);
-                for(int a = 0; a < multigraphicTable.getRowCount(); a++){
-                    multigraphicTable.setValueAt(((char)(q+a))+"", a, b);
+            for (int b = 1; b < multigraphicTable.getColumnCount(); b++) {
+                char q = (multigraphicTable.getValueAt(0, b) + "").charAt(0);
+                for (int a = 0; a < multigraphicTable.getRowCount(); a++) {
+                    multigraphicTable.setValueAt(((char) (q + a)) + "", a, b);
                 }
             }
             multiCharacterLabel.setFont(daFont);
@@ -3383,88 +3481,88 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
     }//GEN-LAST:event_multiChooseCustomFontButtonActionPerformed
 
     private void multiUpCharButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_multiUpCharButtonActionPerformed
-        int c=multiCharacterLabel.getText().codePointAt(2);
+        int c = multiCharacterLabel.getText().codePointAt(2);
         c++;
         updateMultiChar(c);
     }//GEN-LAST:event_multiUpCharButtonActionPerformed
 
     private void graphemesPerGlyphSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_graphemesPerGlyphSpinnerStateChanged
-        int numberOfGlyphs = ((Integer)graphemesPerGlyphSpinner.getValue()).intValue();
-        if(multigraphicTable.getColumnCount()!= numberOfGlyphs +1){
-            DefaultTableModel defMod = (DefaultTableModel)multigraphicTable.getModel();
+        int numberOfGlyphs = ((Integer) graphemesPerGlyphSpinner.getValue()).intValue();
+        if (multigraphicTable.getColumnCount() != numberOfGlyphs + 1) {
+            DefaultTableModel defMod = (DefaultTableModel) multigraphicTable.getModel();
             defMod.setColumnCount(3);
-            for(int a=2;a<numberOfGlyphs;a++){
-                defMod.addColumn("Grapheme "+ (a+1));
+            for (int a = 2; a < numberOfGlyphs; a++) {
+                defMod.addColumn("Grapheme " + (a + 1));
             }
-            for(int a = 0;a<=numberOfGlyphs;a++){
+            for (int a = 0; a <= numberOfGlyphs; a++) {
                 multigraphicTable.getColumnModel().getColumn(a).setCellRenderer(tcr2);
             }
         }
     }//GEN-LAST:event_graphemesPerGlyphSpinnerStateChanged
 
     private void multiDownCharButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_multiDownCharButtonActionPerformed
-        int c=multiCharacterLabel.getText().codePointAt(2);
+        int c = multiCharacterLabel.getText().codePointAt(2);
         c--;
-        if(c<32)
-            c=32;
+        if (c < 32) {
+            c = 32;
+        }
         updateMultiChar(c);
     }//GEN-LAST:event_multiDownCharButtonActionPerformed
 
     private void multiUpPageButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_multiUpPageButtonActionPerformed
-        int c=multiCharacterLabel.getText().codePointAt(2);
-        c+=256;
+        int c = multiCharacterLabel.getText().codePointAt(2);
+        c += 256;
         updateMultiChar(c);
     }//GEN-LAST:event_multiUpPageButtonActionPerformed
 
     private void multiLeftGlyphButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_multiLeftGlyphButtonActionPerformed
-        if(multigraphicTable.getSelectedColumn()<1){
+        if (multigraphicTable.getSelectedColumn() < 1) {
             multigraphicTable.setColumnSelectionInterval(1, 1);
         }
         System.out.println(multigraphicTable.getSelectedColumn());
-        if(multigraphicTable.getSelectedColumn()>1){
-            multigraphicTable.setColumnSelectionInterval(multigraphicTable.getSelectedColumn()-1,multigraphicTable.getSelectedColumn()-1);
+        if (multigraphicTable.getSelectedColumn() > 1) {
+            multigraphicTable.setColumnSelectionInterval(multigraphicTable.getSelectedColumn() - 1, multigraphicTable.getSelectedColumn() - 1);
         }
     }//GEN-LAST:event_multiLeftGlyphButtonActionPerformed
 
     private void multiRightGlyphButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_multiRightGlyphButtonActionPerformed
-        if(multigraphicTable.getSelectedColumn()<1){
+        if (multigraphicTable.getSelectedColumn() < 1) {
             multigraphicTable.setColumnSelectionInterval(1, 1);
         }
         System.out.println(multigraphicTable.getSelectedColumn());
-        if(multigraphicTable.getSelectedColumn()<multigraphicTable.getColumnCount()-1){
-            multigraphicTable.setColumnSelectionInterval(multigraphicTable.getSelectedColumn()+1,multigraphicTable.getSelectedColumn()+1);
+        if (multigraphicTable.getSelectedColumn() < multigraphicTable.getColumnCount() - 1) {
+            multigraphicTable.setColumnSelectionInterval(multigraphicTable.getSelectedColumn() + 1, multigraphicTable.getSelectedColumn() + 1);
         }
     }//GEN-LAST:event_multiRightGlyphButtonActionPerformed
 
     private void multiSetGlyphButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_multiSetGlyphButtonActionPerformed
-        if(multigraphicTable.getSelectedColumn()<1){
-            multigraphicTable.setColumnSelectionInterval(1,1);
+        if (multigraphicTable.getSelectedColumn() < 1) {
+            multigraphicTable.setColumnSelectionInterval(1, 1);
         }
-        try{
+        try {
             int v = multiCharacterLabel.getText().codePointAt(2);
             multigraphicTable.setValueAt(new String(Character.toChars(v)), multigraphicTable.getSelectedRow(), multigraphicTable.getSelectedColumn());
-        }
-        catch (IndexOutOfBoundsException ex){
+        } catch (IndexOutOfBoundsException ex) {
             JOptionPane.showMessageDialog(this, "Please choose a place to set it!", null,
                     JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_multiSetGlyphButtonActionPerformed
 
     private void multiAutoFillButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_multiAutoFillButtonActionPerformed
-        if(multigraphicTable.getSelectedColumn()<1){
+        if (multigraphicTable.getSelectedColumn() < 1) {
             multigraphicTable.setColumnSelectionInterval(1, 1);
         }
         Object[] o = new Object[multigraphicTable.getColumnCount()];
-        for(int z=0; z<multigraphicTable.getColumnCount(); z++){
+        for (int z = 0; z < multigraphicTable.getColumnCount(); z++) {
             o[z] = multigraphicTable.getValueAt(0, z);
         }
-        if (o[0] == null){
-            JOptionPane.showMessageDialog(this, "Cannot start with null!", "Oops!",JOptionPane.ERROR_MESSAGE);
+        if (o[0] == null) {
+            JOptionPane.showMessageDialog(this, "Cannot start with null!", "Oops!", JOptionPane.ERROR_MESSAGE);
         } else {
-            for (int z=1; z<multigraphicTable.getColumnCount(); z++){
-                String s = o[z]+"";
+            for (int z = 1; z < multigraphicTable.getColumnCount(); z++) {
+                String s = o[z] + "";
                 int c = s.codePointAt(0);
-                for (int row = 0; row < multigraphicTable.getRowCount(); row++){
+                for (int row = 0; row < multigraphicTable.getRowCount(); row++) {
                     multigraphicTable.setValueAt(new String(Character.toChars(c)), row, z);
                     c++;
                 }
@@ -3473,24 +3571,24 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
     }//GEN-LAST:event_multiAutoFillButtonActionPerformed
 
     private void multiUseEndersCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_multiUseEndersCheckboxActionPerformed
-        if (multiUseEndersCheckbox.isSelected()){
-            DefaultTableModel model = (DefaultTableModel)multigraphicTable.getModel();
+        if (multiUseEndersCheckbox.isSelected()) {
+            DefaultTableModel model = (DefaultTableModel) multigraphicTable.getModel();
             HashMap ws = getWritingSystem();
             System.out.println(ws);
-            HashMap phs=(HashMap)ws.get("Phonemes");
-            if(!phs.containsKey("Phonemes")){
-                model.addRow(new String[]{"Enders","",""});
+            HashMap phs = (HashMap) ws.get("Phonemes");
+            if (!phs.containsKey("Phonemes")) {
+                model.addRow(new String[]{"Enders", "", ""});
             }
         }
-        if (!multiUseEndersCheckbox.isSelected()){
-            DefaultTableModel model = (DefaultTableModel)multigraphicTable.getModel();
+        if (!multiUseEndersCheckbox.isSelected()) {
+            DefaultTableModel model = (DefaultTableModel) multigraphicTable.getModel();
             int rc = model.getRowCount();
             model.setRowCount(--rc);
         }
     }//GEN-LAST:event_multiUseEndersCheckboxActionPerformed
 
     private void multiJumpToFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_multiJumpToFieldActionPerformed
-        int v = Integer.parseInt(multiJumpToField.getText(),16);
+        int v = Integer.parseInt(multiJumpToField.getText(), 16);
         updateMultiChar(v);
     }//GEN-LAST:event_multiJumpToFieldActionPerformed
 
@@ -3499,22 +3597,22 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
     }//GEN-LAST:event_fontFieldActionPerformed
 
     private void punctUpGlyphButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_punctUpGlyphButtonActionPerformed
-        int selRow=punctuationTable.getSelectedRow();
-        if(selRow-1 >= 0){
-            punctuationTable.setRowSelectionInterval(selRow-1, selRow-1);
-            punctuationTable.scrollRectToVisible(punctuationTable.getCellRect(selRow-1, 0, true));
+        int selRow = punctuationTable.getSelectedRow();
+        if (selRow - 1 >= 0) {
+            punctuationTable.setRowSelectionInterval(selRow - 1, selRow - 1);
+            punctuationTable.scrollRectToVisible(punctuationTable.getCellRect(selRow - 1, 0, true));
         } else {
-            selRow = punctuationTable.getRowCount()-1;
+            selRow = punctuationTable.getRowCount() - 1;
             punctuationTable.setRowSelectionInterval(selRow, selRow);
             punctuationTable.scrollRectToVisible(punctuationTable.getCellRect(selRow, 0, true));
         }
     }//GEN-LAST:event_punctUpGlyphButtonActionPerformed
 
     private void multiDownButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_multiDownButton1ActionPerformed
-        int selRow=punctuationTable.getSelectedRow();
-        if(selRow+1 < punctuationTable.getRowCount()){
-            punctuationTable.setRowSelectionInterval(selRow+1, selRow+1);
-            punctuationTable.scrollRectToVisible(punctuationTable.getCellRect(selRow+1, 0, true));
+        int selRow = punctuationTable.getSelectedRow();
+        if (selRow + 1 < punctuationTable.getRowCount()) {
+            punctuationTable.setRowSelectionInterval(selRow + 1, selRow + 1);
+            punctuationTable.scrollRectToVisible(punctuationTable.getCellRect(selRow + 1, 0, true));
         } else {
             selRow = 0;
             punctuationTable.setRowSelectionInterval(selRow, selRow);
@@ -3523,71 +3621,90 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
     }//GEN-LAST:event_multiDownButton1ActionPerformed
 
     private void punctSetGlyphButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_punctSetGlyphButtonActionPerformed
-        if(punctuationTable.getSelectedColumn()<1){
-            punctuationTable.setColumnSelectionInterval(1,1);
+        if (punctuationTable.getSelectedColumn() < 1) {
+            punctuationTable.setColumnSelectionInterval(1, 1);
         }
-        try{
+        try {
             int v = punctCharacterLabel.getText().codePointAt(2);
             punctuationTable.setValueAt(new String(Character.toChars(v)) + "", punctuationTable.getSelectedRow(), punctuationTable.getSelectedColumn());
-        }
-        catch (IndexOutOfBoundsException ex){
+        } catch (IndexOutOfBoundsException ex) {
             JOptionPane.showMessageDialog(this, "Please choose a place to set it!", null,
                     JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_punctSetGlyphButtonActionPerformed
 
     private void punctiDownPageButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_punctiDownPageButtonActionPerformed
-        int c=punctCharacterLabel.getText().codePointAt(2);
-        c-=256;
-        if(c<32)
-            c=32;
+        int c = punctCharacterLabel.getText().codePointAt(2);
+        c -= 256;
+        if (c < 32) {
+            c = 32;
+        }
         updatePunctChar(c);
     }//GEN-LAST:event_punctiDownPageButtonActionPerformed
 
     private void punctDownCharButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_punctDownCharButtonActionPerformed
-        int c=punctCharacterLabel.getText().codePointAt(2);
+        int c = punctCharacterLabel.getText().codePointAt(2);
         c--;
-        if(c<32)
-            c=32;
+        if (c < 32) {
+            c = 32;
+        }
         updatePunctChar(c);
     }//GEN-LAST:event_punctDownCharButtonActionPerformed
 
     private void punctUpCharButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_punctUpCharButtonActionPerformed
-        int c=punctCharacterLabel.getText().codePointAt(2);
+        int c = punctCharacterLabel.getText().codePointAt(2);
         c++;
         updatePunctChar(c);
     }//GEN-LAST:event_punctUpCharButtonActionPerformed
 
     private void punctUpPageButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_punctUpPageButtonActionPerformed
-        int c=punctCharacterLabel.getText().codePointAt(2);
-        c+=256;
+        int c = punctCharacterLabel.getText().codePointAt(2);
+        c += 256;
         updatePunctChar(c);
     }//GEN-LAST:event_punctUpPageButtonActionPerformed
 
     private void punctAutoFillButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_punctAutoFillButtonActionPerformed
-         Object o = punctuationTable.getValueAt(0, 1);
-        if (o == null){
-            JOptionPane.showMessageDialog(this, "Can not start with null!", "Oops!",JOptionPane.ERROR_MESSAGE);
+        Object o = punctuationTable.getValueAt(0, 1);
+        if (o == null) {
+            JOptionPane.showMessageDialog(this, "Can not start with null!", "Oops!", JOptionPane.ERROR_MESSAGE);
         } else {
-            String s = o+"";
-            int q = ((String)punctuationTable.getValueAt(0, 1)).codePointAt(0);
-            for (int row = 0; row < punctuationTable.getRowCount(); row++){
-                int c = ((String)punctuationTable.getValueAt(row, 0)).codePointAt(0) - 32;
+            String s = o + "";
+            int q = ((String) punctuationTable.getValueAt(0, 1)).codePointAt(0);
+            for (int row = 0; row < punctuationTable.getRowCount(); row++) {
+                int c = ((String) punctuationTable.getValueAt(row, 0)).codePointAt(0) - 32;
                 punctuationTable.setValueAt(new String(Character.toChars(c + q)), row, 1);
             }
         }
     }//GEN-LAST:event_punctAutoFillButtonActionPerformed
 
     private void punctJumpToFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_punctJumpToFieldActionPerformed
-        int v = Integer.parseInt(punctJumpToField.getText(),16);
+        int v = Integer.parseInt(punctJumpToField.getText(), 16);
         updatePunctChar(v);
     }//GEN-LAST:event_punctJumpToFieldActionPerformed
 
+    @SuppressWarnings("CallToThreadDumpStack")
     private void writingSystemPaneStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_writingSystemPaneStateChanged
-        if(writingSystemPane.getSelectedIndex() < 5){
-            writingSystem.put("System",writingSystemPane.getTitleAt(writingSystemPane.getSelectedIndex()));
+        if (writingSystemPane.getSelectedIndex() < 5) {
+            writingSystem.put("System", writingSystemPane.getTitleAt(writingSystemPane.getSelectedIndex()));
         }
         System.out.println(writingSystem.get("System"));
+        if (writingSystemPane.getSelectedIndex() == 7) {
+            File here = new File(".");
+            File[] wsList = here.listFiles(new rwWsFileFilter());
+            DefaultTableModel dtm = (DefaultTableModel) userDefdTable.getModel();
+            //userDefdTable.removeColumn(userDefdTable.getColumn("Sample Text"));
+            dtm.setRowCount(0);
+            for (int a = 0; a < wsList.length; a++) {
+                try {
+                    InputSource ins = new InputSource(wsList[a].getPath());
+                    XPath xpath = XPathFactory.newInstance().newXPath();
+                    NodeList list = (NodeList) xpath.evaluate("//System/text()", ins, XPathConstants.NODESET);
+                    dtm.addRow(new String[]{wsList[a].getName().substring(0, wsList[a].getName().length() - 4), list.item(0).getNodeValue(), wsList[a].getCanonicalPath()});
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
     }//GEN-LAST:event_writingSystemPaneStateChanged
 
     private void syllabaryCustomFontFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_syllabaryCustomFontFieldActionPerformed
@@ -3595,71 +3712,71 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
     }//GEN-LAST:event_syllabaryCustomFontFieldActionPerformed
 
     private void vowelCarrierCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_vowelCarrierCheckActionPerformed
-        if (vowelCarrierCheck.isSelected()){
-            DefaultTableModel model = (DefaultTableModel)abugidaTable.getModel();
-            model.addRow(new String[]{"VowelCarrier","",""});
+        if (vowelCarrierCheck.isSelected()) {
+            DefaultTableModel model = (DefaultTableModel) abugidaTable.getModel();
+            model.addRow(new String[]{"VowelCarrier", "", ""});
         }
-        if (!vowelCarrierCheck.isSelected()){
-            DefaultTableModel model = (DefaultTableModel)abugidaTable.getModel();
+        if (!vowelCarrierCheck.isSelected()) {
+            DefaultTableModel model = (DefaultTableModel) abugidaTable.getModel();
             int rc = model.getRowCount();
             model.setRowCount(--rc);
         }
     }//GEN-LAST:event_vowelCarrierCheckActionPerformed
 
     private void noVowelCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_noVowelCheckboxActionPerformed
-        if (noVowelCheckbox.isSelected()){
-            DefaultTableModel model = (DefaultTableModel)abugidaTable.getModel();
-            model.addRow(new String[]{"NoVowel","",""});
+        if (noVowelCheckbox.isSelected()) {
+            DefaultTableModel model = (DefaultTableModel) abugidaTable.getModel();
+            model.addRow(new String[]{"NoVowel", "", ""});
         }
-        if (!noVowelCheckbox.isSelected()){
-            DefaultTableModel model = (DefaultTableModel)abugidaTable.getModel();
+        if (!noVowelCheckbox.isSelected()) {
+            DefaultTableModel model = (DefaultTableModel) abugidaTable.getModel();
             int rc = model.getRowCount();
             model.setRowCount(--rc);
         }
     }//GEN-LAST:event_noVowelCheckboxActionPerformed
 
     private void abjadVowelCarrierCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_abjadVowelCarrierCheckActionPerformed
-        if(abjadVowelCarrierCheck.isSelected()){
-            DefaultTableModel model = (DefaultTableModel)abjadTable.getModel();
-            model.addRow(new String[]{"VowelCarrier","",""});
+        if (abjadVowelCarrierCheck.isSelected()) {
+            DefaultTableModel model = (DefaultTableModel) abjadTable.getModel();
+            model.addRow(new String[]{"VowelCarrier", "", ""});
         }
-        if (!abjadVowelCarrierCheck.isSelected()){
-            DefaultTableModel model = (DefaultTableModel)abjadTable.getModel();
+        if (!abjadVowelCarrierCheck.isSelected()) {
+            DefaultTableModel model = (DefaultTableModel) abjadTable.getModel();
             int rc = model.getRowCount();
             model.setRowCount(--rc);
         }
     }//GEN-LAST:event_abjadVowelCarrierCheckActionPerformed
 
     private void useSystemButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_useSystemButtonActionPerformed
-        String tabs="Alphabet    Abjad       Abugida     Syllabary   Multigraphic";
-        String[] writeSyst = (String[])presets.elementAt(presetsTable.getSelectedRow());
-        for (int a =0; a < writeSyst.length; a++){
+        String tabs = "Alphabet    Abjad       Abugida     Syllabary   Multigraphic";
+        String[] writeSyst = (String[]) presets.elementAt(presetsTable.getSelectedRow());
+        for (int a = 0; a < writeSyst.length; a++) {
             System.out.println(writeSyst[a]);
         }
-        if(writeSyst[1].equals("Alphabet")){
-            String glyphuses="IMFSUL";
+        if (writeSyst[1].equals("Alphabet")) {
+            String glyphuses = "IMFSUL";
             alphaGlyphsPerLetterSpinner.setValue(writeSyst[10].length());
-            for(int a=1;a<writeSyst[10].length()+1;a++){
-                alphaTable.setValueAt(new String(Character.toChars(Integer.parseInt(writeSyst[3+a],16))), 0, a);
+            for (int a = 1; a < writeSyst[10].length() + 1; a++) {
+                alphaTable.setValueAt(new String(Character.toChars(Integer.parseInt(writeSyst[3 + a], 16))), 0, a);
                 alphaLetterGlyphNumberCombo.setSelectedIndex(a - 1);
                 alphaLetterUsedInCombo.setSelectedIndex(glyphuses.indexOf(writeSyst[10].charAt(a - 1)));
             }
-            if(alphaGlyphUseMap.containsValue("Upper")){
+            if (alphaGlyphUseMap.containsValue("Upper")) {
                 capitalizationCombo.setSelectedIndex(2);
             }
             borrowedCharsRadio.setSelected(true);
             punctuationTable.setValueAt(new String(Character.toChars(Integer.parseInt(writeSyst[3], 16))), 0, 1);
             punctAutoFillButtonActionPerformed(evt);
             autofillAlphabetButtonActionPerformed(evt);
-            if(writeSyst[writeSyst.length - 1].equals("rtl")){
+            if (writeSyst[writeSyst.length - 1].equals("rtl")) {
                 directionalityButton.setSelected(true);
             }
         }
-        if(writeSyst[1].equals("Abjad")){
+        if (writeSyst[1].equals("Abjad")) {
             String glyphuses = "IiMmFSUL";
             abjadGlyphsPerConsonantSpinner.setValue(writeSyst[10].length());
-            for(int a=1; a<writeSyst[10].length()+1;a++){
-                abjadTable.setValueAt(new String(Character.toChars(Integer.parseInt(writeSyst[3+a],16))), 0, a);
+            for (int a = 1; a < writeSyst[10].length() + 1; a++) {
+                abjadTable.setValueAt(new String(Character.toChars(Integer.parseInt(writeSyst[3 + a], 16))), 0, a);
                 abjadConsonantGlyphNumberCombo.setSelectedIndex(a - 1);
                 abjadConsonantUsedInCombo.setSelectedIndex(glyphuses.indexOf(writeSyst[10].charAt(a - 1)));
             }
@@ -3668,33 +3785,33 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
             punctAutoFillButtonActionPerformed(evt);
             autofillAbjadButtonActionPerformed(evt);
         }
-        if(writeSyst[1].equals("Abugida")){
-            abugidaTable.setValueAt(new String(Character.toChars(Integer.parseInt(writeSyst[4],16))), 0, 1);
-            punctuationTable.setValueAt(new String(Character.toChars(Integer.parseInt(writeSyst[3],16))), 0, 1);
+        if (writeSyst[1].equals("Abugida")) {
+            abugidaTable.setValueAt(new String(Character.toChars(Integer.parseInt(writeSyst[4], 16))), 0, 1);
+            punctuationTable.setValueAt(new String(Character.toChars(Integer.parseInt(writeSyst[3], 16))), 0, 1);
             punctAutoFillButtonActionPerformed(evt);
             abugidaAutoFillButtonActionPerformed(evt);
         }
-        if(writeSyst[1].equals("Syllabary")){
-            syllabaryTable.setValueAt(new String(Character.toChars(Integer.parseInt(writeSyst[2],16))), 0, 1);
+        if (writeSyst[1].equals("Syllabary")) {
+            syllabaryTable.setValueAt(new String(Character.toChars(Integer.parseInt(writeSyst[2], 16))), 0, 1);
             syllabaryCustomFontCheck.setSelected(false);
             autoFillSyllabaryButtonActionPerformed(evt);
         }
-        if(writeSyst[1].equals("Multigraphic")){
+        if (writeSyst[1].equals("Multigraphic")) {
             graphemesPerGlyphSpinner.setValue(writeSyst[10].length());
-            for(int a = 1;a<writeSyst[10].length()+1;a++){
-                multigraphicTable.setValueAt(new String(Character.toChars(Integer.parseInt(writeSyst[3+a], 16))), 0, a);
+            for (int a = 1; a < writeSyst[10].length() + 1; a++) {
+                multigraphicTable.setValueAt(new String(Character.toChars(Integer.parseInt(writeSyst[3 + a], 16))), 0, a);
             }
             multiUseEndersCheckbox.setSelected(true);
-            punctuationTable.setValueAt(new String(Character.toChars(Integer.parseInt(writeSyst[3],16))), 0, 1);
+            punctuationTable.setValueAt(new String(Character.toChars(Integer.parseInt(writeSyst[3], 16))), 0, 1);
             punctAutoFillButtonActionPerformed(evt);
             multiUseEndersCheckboxActionPerformed(evt);
             multiAutoFillButtonActionPerformed(evt);
         }
-        writingSystemPane.setSelectedIndex(tabs.indexOf(writeSyst[1])/12);
+        writingSystemPane.setSelectedIndex(tabs.indexOf(writeSyst[1]) / 12);
     }//GEN-LAST:event_useSystemButtonActionPerformed
 
     private void directionalityButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_directionalityButtonActionPerformed
-        if(directionalityButton.isSelected()){
+        if (directionalityButton.isSelected()) {
             directionalityButton.setText("L ⬅ R");
             writingSystem.put("Directionality", "rtl");
         } else {
@@ -3703,185 +3820,704 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_directionalityButtonActionPerformed
 
-    public void updateAlphaChar(int s){
-        String ss = new String(Character.toChars(s));
-        characterLabel.setText("XX"+ss +"XX");
-        alphaCurrentVLabel.setText(Integer.toHexString((int)s));
-    }
-
-    public void updateSyllabaryChar(int s){
-        String ss = new String(Character.toChars(s));
-        visibleCharLabel.setText("XX"+ss+"XX");
-        syllabaryCharValueLabel.setText(Integer.toHexString((int)s));
-    }
-
-    public void updateAbjadChar(int s){
-        String ss = new String(Character.toChars(s));
-        abjadCharLabel.setText("XX"+ss+"XX");
-        abjadCurrentVLabel.setText(Integer.toHexString((int)s));
-    }
-
-    public void updateAbugidaChar(int s){
-        String ss = new String(Character.toChars(s));
-        abugidaCharLabel.setText("XX"+ss+"XX");
-        abugidaCurrentVLabel.setText(Integer.toHexString((int)s));
-    }
-
-    public void updateMultiChar(int s){
-        String ss = new String(Character.toChars(s));
-        multiCharacterLabel.setText("XX"+ss+"XX");
-        currentHexValueLabel.setText(Integer.toHexString((int)s));
-    }
-
-    public void updatePunctChar(int s){
-        String ss = new String(Character.toChars(s));
-        punctCharacterLabel.setText("XX"+ss+"XX");
-        punctCurrentHexValueLabel.setText(Integer.toHexString((int)s));
-    }
-
-    public HashMap getWritingSystem(){
-        HashMap ws = new HashMap();
-        HashMap phonemes = new HashMap();
-        String writeSyst =(String)writingSystem.get("System");
-        if(directionalityButton.isSelected()){
-            ws.put("Directionality","rtl");
+    @SuppressWarnings("CallToThreadDumpStack")
+    private void loadWsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadWsButtonActionPerformed
+        if (wsFile == null) {
+            wsFile = new File(".");
+        }
+        if (writingSystemPane.getSelectedIndex() != 7) {
+            writingSystemPane.setSelectedIndex(7);
+            File here = new File(".");
+            File[] wsList = here.listFiles(new rwWsFileFilter());
+            DefaultTableModel dtm = (DefaultTableModel) userDefdTable.getModel();
+            //removeColumn(userDefdTable.getColumn("Sample Text"));
+            dtm.setRowCount(0);
+            for (int a = 0; a < wsList.length; a++) {
+                try {
+                    InputSource ins = new InputSource(wsList[a].getPath());
+                    XPath xpath = XPathFactory.newInstance().newXPath();
+                    NodeList list = (NodeList) xpath.evaluate("//System/text()", ins, XPathConstants.NODESET);
+                    dtm.addRow(new String[]{wsList[a].getName().substring(0, wsList[a].getName().length() - 4), list.item(0).getNodeValue(), wsList[a].getCanonicalPath()});
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
         } else {
-            ws.put("Directionality", "ltr");
+            //userDefdTable.addColumn(userDefdTable.getColumn("Sample Text"));
+            if (wsFile.getPath() == ".") {
+                wsFile = new File(userDefdTable.getValueAt(userDefdTable.getSelectedRow(), 2) + "");
+            }
+            SAXParserFactory factory = SAXParserFactory.newInstance();
+            try {
+                SAXParser saxParser = factory.newSAXParser();
+                DefaultHandler handler = new DefaultHandler() {
+
+                    boolean numberOfLettersTag = false;
+                    boolean capRuleTag = false;
+                    boolean phonemeTag = false;
+                    boolean phonemesTag = false;
+                    boolean fontTag = false;
+                    boolean fontTypeTag = false;
+                    boolean glyphUseTag = false;
+                    boolean numberGlyphsTag = false;
+                    boolean vowelsShownTag = false;
+                    boolean systemTag = false;
+                    boolean pkey = false;
+                    boolean pvalue = false;
+                    boolean numberGraphemesTag = false;
+                    boolean punctTag = false;
+                    boolean glyph1Tag = false;
+                    boolean glyph2Tag = false;
+                    boolean glyph3Tag = false;
+                    boolean glyph4Tag = false;
+                    boolean syllablesTag = false;
+                    boolean syllableTag = false;
+                    boolean skeyTag = false;
+                    boolean svalueTag = false;
+                    boolean vowelsTag = false;
+                    boolean consonantsTag = false;
+                    HashMap phnms = new HashMap();
+                    HashMap sylbs = new HashMap();
+                    String key = "";
+                    String value = "";
+                    String skey = "";
+                    String svalue = "";
+
+                    public void startElement(String uri, String localName, String qName,
+                            Attributes attributes) throws SAXException {
+                        if (qName.equalsIgnoreCase("NumberOfLetters")) {
+                            numberOfLettersTag = true;
+                        }
+                        if (qName.equalsIgnoreCase("CapRule")) {
+                            capRuleTag = true;
+                        }
+                        if (qName.equalsIgnoreCase("Phonemes")) {
+                            phonemeTag = true;
+                        }
+                        if (qName.equalsIgnoreCase("pkey")) {
+                            pkey = true;
+                        }
+                        if (qName.equalsIgnoreCase("Font")) {
+                            fontTag = true;
+                        }
+                        if (qName.equalsIgnoreCase("FontType")) {
+                            fontTypeTag = true;
+                        }
+                        if (qName.equalsIgnoreCase("GlyphUseMap")) {
+                            glyphUseTag = true;
+                        }
+                        if (qName.equalsIgnoreCase("Glyph_1")) {
+                            glyph1Tag = true;
+                        }
+                        if (qName.equalsIgnoreCase("Glyph_2")) {
+                            glyph2Tag = true;
+                        }
+                        if (qName.equalsIgnoreCase("Glyph_3")) {
+                            glyph3Tag = true;
+                        }
+                        if (qName.equalsIgnoreCase("Glyph_4")) {
+                            glyph4Tag = true;
+                        }
+                        if (qName.equalsIgnoreCase("GlyphsPerLetter")) {
+                            numberGlyphsTag = true;
+                        }
+                        if (qName.equalsIgnoreCase("System")) {
+                            systemTag = true;
+                        }
+                        if (qName.equalsIgnoreCase("pvalue")) {
+                            pvalue = true;
+                        }
+                        if (qName.equalsIgnoreCase("phonemes")) {
+                            phonemesTag = true;
+                        }
+                        if (qName.equalsIgnoreCase("graphemesperglyph")) {
+                            numberGraphemesTag = true;
+                        }
+                        if (qName.equalsIgnoreCase("Punctuation")) {
+                            punctTag = true;
+                        }
+                        if (qName.equalsIgnoreCase("Syllables")) {
+                            syllablesTag = true;
+                        }
+                        if (qName.equalsIgnoreCase("skey")) {
+                            skeyTag = true;
+                        }
+                        if (qName.equalsIgnoreCase("svalue")) {
+                            svalueTag = true;
+                        }
+                        if (qName.equalsIgnoreCase("Vowels")) {
+                            vowelsTag = true;
+                        }
+                        if (qName.equalsIgnoreCase("Consonants")) {
+                            consonantsTag = true;
+                        }
+                    }
+
+                    public void endElement(String uri, String localName, String qName)
+                            throws SAXException {
+                        //System.out.print("E:");
+                    }
+
+                    public void characters(char ch[], int start, int length) throws SAXException {
+                        if (numberOfLettersTag) {
+                            writingSystem.put("NumberOfLetters", new String(ch, start, length));
+                            numberOfLettersTag = false;
+                        }
+                        if (capRuleTag) {
+                            writingSystem.put("CapRule", new String(ch, start, length));
+                            capRuleTag = false;
+                        }
+                        if (phonemesTag) {
+                            writingSystem.put("Phonemes", phnms);
+                            phonemesTag = false;
+                        }
+                        if (pkey) {
+                            String coded = new String(ch, start, length);
+                            //key = ((char)Integer.parseInt(coded,16))+"";
+                            key = rwStringConverter.convertFrom64(coded);
+                            pkey = false;
+                        }
+                        if (pvalue) {
+                            String coded = new String(ch, start, length);
+                            value = rwStringConverter.convertFromHex(coded);
+                            //System.out.println(value + " for " + key);
+                            phnms.put(key, value);
+                            pvalue = false;
+                        }
+                        if (fontTag) {
+                            String f = new String(ch, start, length);
+                            writingSystem.put("Font", f);
+                            fontTag = false;
+                        }
+                        if (fontTypeTag) {
+                            String f = new String(ch, start, length);
+                            writingSystem.put("FontType", f);
+                            fontTypeTag = false;
+                        }
+                        if (systemTag) {
+                            String syst = new String(ch, start, length);
+                            writingSystem.put("System", syst);
+                            systemTag = false;
+                        }
+                        if (numberGlyphsTag) {
+                            writingSystem.put("GlyphsPerLetter", new String(ch, start, length));
+                            numberGlyphsTag = false;
+                        }
+                        if (numberGraphemesTag) {
+                            writingSystem.put("GraphemesPerGlyph", new String(ch, start, length));
+                            numberGraphemesTag = false;
+                        }
+                        if (punctTag) {
+                            String punct = new String(ch, start, length);
+                            HashMap punctHash = new HashMap();
+                            for (String keyValue : punct.split(" *, *")) {
+                                String[] pairs = keyValue.split(" *e *", 2);
+                                punctHash.put(rwStringConverter.convertFromHex(pairs[0]), pairs.length == 1 ? "" : rwStringConverter.convertFromHex(pairs[1]));
+                            }
+                            writingSystem.put("Punctuation", punctHash);
+                            punctTag = false;
+                        }
+                        if (glyph1Tag) {
+                            HashMap gum = ((HashMap) writingSystem.get("GlyphUseMap"));
+                            System.out.println(gum);
+                            gum.put("Glyph_1", new String(ch, start, length));
+                            writingSystem.put("GlyphUseMap", gum);
+                            glyph1Tag = false;
+                        }
+                        if (glyph2Tag) {
+                            HashMap gum = ((HashMap) writingSystem.get("GlyphUseMap"));
+                            gum.put("Glyph_2", new String(ch, start, length));
+                            writingSystem.put("GlyphUseMap", gum);
+                            glyph2Tag = false;
+                        }
+                        if (glyph3Tag) {
+                            HashMap gum = ((HashMap) writingSystem.get("GlyphUseMap"));
+                            gum.put("Glyph_3", new String(ch, start, length));
+                            writingSystem.put("GlyphUseMap", gum);
+                            glyph3Tag = false;
+                        }
+                        if (glyph4Tag) {
+                            HashMap gum = ((HashMap) writingSystem.get("GlyphUseMap"));
+                            gum.put("Glyph_4", new String(ch, start, length));
+                            writingSystem.put("GlyphUseMap", gum);
+                            glyph4Tag = false;
+                        }
+                        if (glyphUseTag) {
+                            HashMap gum = new HashMap();
+                            writingSystem.put("GlyphUseMap", gum);
+                            glyphUseTag = false;
+                        }
+                        if (syllablesTag) {
+                            writingSystem.put("Syllables", sylbs);
+                            System.out.println(sylbs);
+                            syllablesTag = false;
+                        }
+                        if (skeyTag) {
+                            skey = new String(ch, start, length);
+                            skeyTag = false;
+                        }
+                        if (svalueTag) {
+                            String coded = new String(ch, start, length);
+                            svalue = rwStringConverter.convertFromHex(coded);
+                            sylbs.put(skey, svalue);
+                            svalueTag = false;
+                        }
+                        if (vowelsTag) {
+                            vows.clear();
+                            String v = new String(ch, start, length);
+                            String[] va = v.split(",");
+                            for (int a = 0; a < va.length; a++) {
+                                if (va[a].contains(" ")) {
+                                    String[] vb = va[a].split(" ");
+                                    String vc = "";
+                                    for (int b = 0; b < vb.length; b++) {
+                                        vc += (char) Integer.parseInt(vb[b], 16);
+                                    }
+                                } else {
+                                    vows.add(((char) Integer.parseInt(va[a], 16)) + "");
+                                }
+                            }
+                            vowelsTag = false;
+                        }
+                        if (consonantsTag) {
+                            cons.clear();
+                            String v = new String(ch, start, length);
+                            String[] va = v.split(",");
+                            for (int a = 0; a < va.length; a++) {
+                                if (va[a].contains(" ")) {
+                                    String[] vb = va[a].split(" ");
+                                    String vc = "";
+                                    for (int b = 0; b < vb.length; b++) {
+                                        vc += (char) Integer.parseInt(vb[b], 16);
+                                    }
+                                    cons.add(vc);
+                                } else {
+                                    cons.add(((char) Integer.parseInt(va[a], 16)) + "");
+                                }
+                            }
+                            consonantsTag = false;
+                        }
+                    }
+
+                    public void endDocument() {
+                        wsLoaded = true;
+                    }
+                };
+                saxParser.parse(wsFile, handler);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            setupSystem(vows, cons, writingSystem);
         }
-        if(writeSyst.equals("Alphabet")){
-            ws.put("System", "Alphabet");
-            ws.put("GlyphsPerLetter", alphaGlyphsPerLetterSpinner.getValue());
-            ws.put("GlyphUseMap", alphaGlyphUseMap);
-            ws.put("NumberOfLetters", alphaTable.getRowCount());
-            for(int a = 0; a < alphaTable.getRowCount(); a++){
-                StringBuilder z = new StringBuilder("");
-                for(int b = 1; b < alphaTable.getColumnCount(); b++){
-                    String q = alphaTable.getValueAt(a, b) + " ";
-                    z.append(q);
-                }
-                phonemes.put(alphaTable.getValueAt(a,0), z);
+    }//GEN-LAST:event_loadWsButtonActionPerformed
+
+    private void saveWsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveWsButtonActionPerformed
+        writingSystem = getWritingSystem();
+        JFileChooser jfc = new JFileChooser(".");
+        String wsName = "";
+        int chosenOption = jfc.showSaveDialog(this);
+        if (chosenOption != JFileChooser.CANCEL_OPTION) {
+            wsName = jfc.getSelectedFile().getPath();
+            if (wsName.endsWith(".rws")) {
+                wsName = wsName.substring(0, wsName.length() - 4);
+                setTitle("Random Language Generator " + jfc.getSelectedFile().getName());
             }
-            ws.put("Phonemes",phonemes);
-            if(!fontField.getText().contains("LCS-ConstructorII")){
-                ws.put("Font", fontField.getText());
-                ws.put("FontType", "custom");
-            } else {
-                ws.put("Font", "LCS-ConstructorII");
-                ws.put("FontType", "borrowed");
-            }
-            ws.put("CapRule", capitalizationCombo.getSelectedItem());
-        } else if (writeSyst.equals("Abjad")){
-            ws.put("System", "Abjad");
-            ws.put("GlyphsPerLetter", abjadGlyphsPerConsonantSpinner.getValue());
-            ws.put("GlyphUseMap", abjadGlyphUseMap);
-            ws.put("NumberOfLetters", abjadTable.getRowCount());
-            for(int a = 0; a< abjadTable.getRowCount(); a++){
-                StringBuilder z = new StringBuilder("");
-                for(int b = 1; b < abjadTable.getColumnCount(); b++){
-                    String q = (abjadTable.getValueAt(a, b) + "").trim() + " ";
-                    z.append(q);
-                }
-                phonemes.put(abjadTable.getValueAt(a,0), z);
-            }
-            ws.put("Phonemes", phonemes);
-            if(!abjadFontField.getText().contains("LCS-ConstructorII")){
-                ws.put("Font", abjadFontField.getText());
-                ws.put("FontType", "custom");
-            } else {
-                ws.put("Font", "LCS-ConstructorII");
-                ws.put("FontType", "borrowed");
-            }
-            ws.put("VowelsShown", true);
-        } else if (writeSyst.equals("Abugida")){
-            ws.put("System", "Abugida");
-            ws.put("GlyphsPerLetter", 1);
-            ws.put("NumberOfLetters", abugidaTable.getRowCount());
-            for(int a = 0; a < abugidaTable.getRowCount(); a++){
-                StringBuilder z = new StringBuilder("");
-                for(int b = 1; b < abugidaTable.getColumnCount(); b++){
-                    String q = abugidaTable.getValueAt(a, b)+"";
-                    z.append(q);
-                }
-                phonemes.put(abugidaTable.getValueAt(a,0), z);
-            }
-            ws.put("Phonemes",phonemes);
-            if(!abugidaFontField.getText().contains("LCS-ConstructorII")){
-                ws.put("Font", abugidaFontField.getText());
-                ws.put("FontType", "custom");
-            } else {
-                ws.put("Font", "LCS-ConstructorII");
-                ws.put("FontType", "borrowed");
-            }
-        } else if (writeSyst.equals("Syllabary")){
-            if(syllabaryCustomFontCheck.isSelected()){
-                ws.put("Font", syllabaryCustomFontField.getText());
-            } else {
-                ws.put("Font", "LCS-ConstructorII");
-            }
-            ws.put("System", "Syllabary");
-            ws.put("NumberOfSyllables", syllabaryTable.getRowCount() * (syllabaryTable.getColumnCount()-1));
-            HashMap syllables=new HashMap();
-            for(int a = 0; a < syllabaryTable.getRowCount(); a++){
-                for (int b = 1; b < syllabaryTable.getColumnCount(); b++){
-                    String syllable = syllabaryTable.getValueAt(a, 0) + "" +
-                            syllabaryTable.getColumnName(b);
-                    syllables.put(syllable, syllabaryTable.getValueAt(a, b));
-                }
-            }
-            ws.put("Syllables", syllables);
-            if(syllabaryCustomFontCheck.isSelected()){
-                ws.put("FontType", "custom");
-                ws.put("Font", syllabaryCustomFontField.getText());
-            } else {
-                ws.put("FontType", "borrowed");
-            }
-        } else if (writeSyst.equals("Multigraphic")){
-            ws.put("System","Multigraphic");
-            ws.put("GraphemesPerGlyph",graphemesPerGlyphSpinner.getValue());
-            ws.put("Font",multiCustomFontField.getText());
-            if(multiBorrowedRadio.isSelected()){
-                ws.put("FontType","Borrowed");
-            } else {
-                ws.put("FontType", "Custom");
-            }
-            ws.put("NumberOfLetters", multigraphicTable.getRowCount());
-            for(int a = 0; a < multigraphicTable.getRowCount(); a++){
-                StringBuilder z = new StringBuilder("");
-                for(int b = 1; b < multigraphicTable.getColumnCount(); b++){
-                    String q = multigraphicTable.getValueAt(a, b) + " ";
-                    z.append(q);
-                }
-                phonemes.put(multigraphicTable.getValueAt(a,0), z);
-            }
-            ws.put("Phonemes",phonemes);
         }
-        if (punctuationSet){
-            HashMap punct = new HashMap();
-            for(int p = 0; p < punctuationTable.getRowCount(); p ++){
-                punct.put(punctuationTable.getValueAt(p, 0)+"",
-                        punctuationTable.getValueAt(p, 1)+"");
+        try {
+            String fileName = wsName;
+            if (!fileName.endsWith(".rws")) {
+                fileName += ".rws";
             }
-            ws.put("Punctuation", punct);
+            PrintWriter out = new PrintWriter(new File(fileName));
+            StreamResult streamResult = new StreamResult(out);
+            SAXTransformerFactory tf = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
+            TransformerHandler hd = tf.newTransformerHandler();
+            Transformer serializer = hd.getTransformer();
+            serializer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+            serializer.setOutputProperty(OutputKeys.INDENT, "Yes");
+            serializer.setOutputProperty(OutputKeys.STANDALONE, "Yes");
+            hd.setResult(streamResult);
+            hd.startDocument();
+            AttributesImpl atts = new AttributesImpl();
+            hd.startElement("", "", "WritingSystem", atts);
+            hd.startElement("", "", "System", atts);
+            String s = (String) writingSystem.get("System");
+            hd.characters(s.toCharArray(), 0, s.length());
+            hd.endElement("", "", "System");
+            hd.startElement("", "", "FontType", atts);
+            String ft = (String) writingSystem.get("FontType");
+            hd.characters(ft.toCharArray(), 0, ft.length());
+            hd.endElement("", "", "FontType");
+            hd.startElement("", "", "Font", atts);
+            ft = (String) writingSystem.get("Font");
+            hd.characters(ft.toCharArray(), 0, ft.length());
+            hd.endElement("", "", "Font");
+            hd.startElement("", "", "Vowels", atts);
+            String daVowels = "";
+            for (int a = 0; a < vows.size(); a++) {
+                String uc = "";
+                String ub = "";
+                for (int b = 0; b < ((String) vows.elementAt(a)).length(); b++) {
+                    uc = Integer.toHexString((int) Character.codePointAt((CharSequence) vows.elementAt(a), b));
+                    if (ub.length() > 0) {
+                        ub += " ";
+                    }
+                    ub += uc;
+                }
+                daVowels += ub;
+                if (a < vows.size() - 1) {
+                    daVowels += ",";
+                }
+            }
+            hd.startCDATA();
+            hd.characters(daVowels.toCharArray(), 0, daVowels.length());
+            hd.endCDATA();
+            hd.endElement("", "", "Vowels");
+            hd.startElement("", "", "Consonants", atts);
+            String cnsnts = "";
+            for (int a = 0; a < cons.size(); a++) {
+                String uc = "";
+                String ub = "";
+                for (int b = 0; b < ((String) cons.elementAt(a)).length(); b++) {
+                    uc = Integer.toHexString((int) Character.codePointAt((CharSequence) cons.elementAt(a), b));
+                    if (ub.length() > 0) {
+                        ub += " ";
+                    }
+                    ub += uc;
+                }
+                cnsnts += ub;
+                if (a < cons.size() - 1) {
+                    cnsnts += ",";
+                }
+            }
+            hd.startCDATA();
+            hd.characters(cnsnts.toCharArray(), 0, cnsnts.length());
+            hd.endCDATA();
+            hd.endElement("", "", "Consonants");
+            if (!s.equals("System")) {
+                hd.startElement("", "", "NumberOfLetters", atts);
+                String nl = writingSystem.get("NumberOfLetters") + "";
+                hd.characters(nl.toCharArray(), 0, nl.length());
+                hd.endElement("", "", "NumberOfLetters");
+                String nc = "0";
+                String sq = (String) writingSystem.get("System");
+                if (sq.equals("Alphabet") || sq.equals("Abjad")) {
+                    hd.startElement("", "", "GlyphsPerLetter", atts);
+                    nc = writingSystem.get("GlyphsPerLetter") + "";
+                    hd.characters(nc.toCharArray(), 0, nc.length());
+                    hd.endElement("", "", "GlyphsPerLetter");
+                }
+                if (sq.equals("Multigraphic")) {
+                    hd.startElement("", "", "GraphemesPerGlyph", atts);
+                    nc = writingSystem.get("GraphemesPerGlyph") + "";
+                    hd.characters(nc.toCharArray(), 0, nc.length());
+                    hd.endElement("", "", "GraphemesPerGlyph");
+                }
+                if (((HashMap) writingSystem).containsKey("GlyphUseMap")) {
+                    hd.startElement("", "", "GlyphUseMap", atts);
+                    HashMap gum = (HashMap) writingSystem.get("GlyphUseMap");
+                    for (int numGlyphs = 0; numGlyphs < Integer.parseInt(nc); numGlyphs++) {
+                        hd.startElement("", "", "Glyph_" + (numGlyphs + 1), atts);
+                        String gp = (String) gum.get("Glyph_" + (numGlyphs + 1));
+                        hd.characters(gp.toCharArray(), 0, gp.length());
+                        hd.endElement("", "", "Glyph_" + (numGlyphs + 1));
+                    }
+                    hd.endElement("", "", "GlyphUseMap");
+                }
+                if (s.equals("Alphabet")) {
+                    hd.startElement("", "", "CapRule", atts);
+                    String cr = writingSystem.get("CapRule") + "";
+                    hd.characters(cr.toCharArray(), 0, cr.length());
+                    hd.endElement("", "", "CapRule");
+                }
+                if (((HashMap) writingSystem).containsKey("Phonemes")) {
+                    HashMap phns = (HashMap) writingSystem.get("Phonemes");
+                    hd.startElement("", "", "Phonemes", atts);
+                    Object[] keys = phns.keySet().toArray();
+                    for (int phn = 0; phn < keys.length; phn++) {
+                        hd.startElement("", "", "Phoneme", atts);
+                        hd.startElement("", "", "pkey", atts);
+                        String hky = rwStringConverter.convertTo64(keys[phn] + "");
+                        hd.startCDATA();
+                        hd.characters(hky.toCharArray(), 0, hky.length());
+                        hd.endCDATA();
+                        hd.endElement("", "", "pkey");
+                        hd.startElement("", "", "pvalue", atts);
+                        String phone = phns.get(keys[phn]).toString();
+                        byte[] bs = phone.getBytes("UTF-8");
+                        String hexes = "0123456789ABCDEF";
+                        StringBuilder sb = new StringBuilder(2 * bs.length);
+                        for (byte b : bs) {
+                            sb.append(hexes.charAt((b & 0xF0) >> 4)).append(hexes.charAt((b & 0x0F)));
+                        }
+                        hd.startCDATA();
+                        hd.characters(sb.toString().toCharArray(), 0, sb.toString().length());
+                        hd.endCDATA();
+                        hd.endElement("", "", "pvalue");
+                        hd.endElement("", "", "Phoneme");
+                    }
+                    hd.endElement("", "", "Phonemes");
+                }
+            }
+            if (s.equals("Abjad")) {
+                hd.startElement("", "", "VowelsShown", atts);
+                String vs = writingSystem.get("VowelsShown") + "";
+                hd.characters(vs.toCharArray(), 0, vs.length());
+                hd.endElement("", "", "VowelsShown");
+            }
+            if (s.equals("Abugida")) {
+            }
+            if (s.equals("Syllabary")) {
+                hd.startElement("", "", "NumberOfSyllables", atts);
+                String ns = writingSystem.get("NumberOfSyllables") + "";
+                hd.characters(ns.toCharArray(), 0, ns.length());
+                hd.endElement("", "", "NumberOfSyllables");
+                hd.startElement("", "", "Syllables", atts);
+                HashMap sylbls = (HashMap) writingSystem.get("Syllables");
+                Object[] keys = sylbls.keySet().toArray();
+                for (int sc = 0; sc < (Integer.parseInt(ns)); sc++) {
+                    hd.startElement("", "", "Syllable", atts);
+                    hd.startElement("", "", "skey", atts);
+                    String ky = keys[sc].toString();
+                    System.out.println(ky + " " + sc);
+                    hd.characters(ky.toCharArray(), 0, ky.length());
+                    hd.endElement("", "", "skey");
+                    hd.startElement("", "", "svalue", atts);
+                    String syllable = sylbls.get(ky).toString();
+                    byte[] bs = syllable.getBytes("UTF-8");
+                    String hexes = "0123456789ABCDEF";
+                    StringBuilder sb = new StringBuilder(2 * bs.length);
+                    for (byte b : bs) {
+                        sb.append(hexes.charAt((b & 0xF0) >> 4)).append(hexes.charAt((b & 0x0F)));
+                    }
+                    //String vl = sylbls.get(ky).toString();
+                    hd.characters(sb.toString().toCharArray(), 0, sb.toString().length());
+                    hd.endElement("", "", "svalue");
+                    hd.endElement("", "", "Syllable");
+                }
+                hd.endElement("", "", "Syllables");
+            }
+            if (s.equals("Multigraphic")) {
+            }
+            hd.startElement("", "", "Punctuation", atts);
+            HashMap punct = (HashMap) writingSystem.get("Punctuation");
+            System.out.println(writingSystem);
+            String pm = "";
+            for (Object key : punct.keySet()) {
+                pm += rwStringConverter.convertToHex(key + "") + "e"
+                        + rwStringConverter.convertToHex(punct.get(key) + "") + ", ";
+            }
+            pm = pm.substring(0, pm.length() - 2);
+            //pm = rwStringConverter.convertTo64(pm);
+            hd.startCDATA();
+            hd.characters(pm.toCharArray(), 0, pm.length());
+            hd.endCDATA();
+            hd.endElement("", "", "Punctuation");
+            hd.endElement("", "", "WritingSystem");
+            hd.endDocument();
+            out.close();
+        } catch (Exception ex) {
+            System.out.println(ex);
+            ex.printStackTrace();
         }
-        return ws;
+    }//GEN-LAST:event_saveWsButtonActionPerformed
+
+    private void browse4WsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browse4WsButtonActionPerformed
+        JFileChooser jfc = new JFileChooser(".");
+        FileNameExtensionFilter fnef = new FileNameExtensionFilter("Random Languange Generator Writing System files", "rws");
+        jfc.addChoosableFileFilter(fnef);
+        int chosenOption = jfc.showOpenDialog(this);
+        if (chosenOption != JFileChooser.CANCEL_OPTION) {
+            wsFile = jfc.getSelectedFile();
+            loadWsButtonActionPerformed(evt);
+        }
+    }//GEN-LAST:event_browse4WsButtonActionPerformed
+
+    public void updateAlphaChar(int s) {
+        String ss = new String(Character.toChars(s));
+        characterLabel.setText("XX" + ss + "XX");
+        alphaCurrentVLabel.setText(Integer.toHexString((int) s));
     }
 
-    public void setWritingSystem(java.util.HashMap ws){
+    public void updateSyllabaryChar(int s) {
+        String ss = new String(Character.toChars(s));
+        visibleCharLabel.setText("XX" + ss + "XX");
+        syllabaryCharValueLabel.setText(Integer.toHexString((int) s));
+    }
+
+    public void updateAbjadChar(int s) {
+        String ss = new String(Character.toChars(s));
+        abjadCharLabel.setText("XX" + ss + "XX");
+        abjadCurrentVLabel.setText(Integer.toHexString((int) s));
+    }
+
+    public void updateAbugidaChar(int s) {
+        String ss = new String(Character.toChars(s));
+        abugidaCharLabel.setText("XX" + ss + "XX");
+        abugidaCurrentVLabel.setText(Integer.toHexString((int) s));
+    }
+
+    public void updateMultiChar(int s) {
+        String ss = new String(Character.toChars(s));
+        multiCharacterLabel.setText("XX" + ss + "XX");
+        currentHexValueLabel.setText(Integer.toHexString((int) s));
+    }
+
+    public void updatePunctChar(int s) {
+        String ss = new String(Character.toChars(s));
+        punctCharacterLabel.setText("XX" + ss + "XX");
+        punctCurrentHexValueLabel.setText(Integer.toHexString((int) s));
+    }
+
+    public HashMap getWritingSystem() {
+        if (wsLoaded) {
+            return writingSystem;
+        } else {
+            HashMap ws = new HashMap();
+            HashMap phonemes = new HashMap();
+            String writeSyst = (String) writingSystem.get("System");
+            if (directionalityButton.isSelected()) {
+                ws.put("Directionality", "rtl");
+            } else {
+                ws.put("Directionality", "ltr");
+            }
+            if (writeSyst.equals("Alphabet")) {
+                ws.put("System", "Alphabet");
+                ws.put("GlyphsPerLetter", alphaGlyphsPerLetterSpinner.getValue());
+                ws.put("GlyphUseMap", alphaGlyphUseMap);
+                ws.put("NumberOfLetters", alphaTable.getRowCount());
+                for (int a = 0; a < alphaTable.getRowCount(); a++) {
+                    StringBuilder z = new StringBuilder("");
+                    for (int b = 1; b < alphaTable.getColumnCount(); b++) {
+                        String q = alphaTable.getValueAt(a, b) + " ";
+                        z.append(q);
+                    }
+                    phonemes.put(alphaTable.getValueAt(a, 0), z);
+                }
+                ws.put("Phonemes", phonemes);
+                if (!fontField.getText().contains("LCS-ConstructorII")) {
+                    ws.put("Font", fontField.getText());
+                    ws.put("FontType", "custom");
+                } else {
+                    ws.put("Font", "LCS-ConstructorII");
+                    ws.put("FontType", "borrowed");
+                }
+                ws.put("CapRule", capitalizationCombo.getSelectedItem());
+            } else if (writeSyst.equals("Abjad")) {
+                ws.put("System", "Abjad");
+                ws.put("GlyphsPerLetter", abjadGlyphsPerConsonantSpinner.getValue());
+                ws.put("GlyphUseMap", abjadGlyphUseMap);
+                ws.put("NumberOfLetters", abjadTable.getRowCount());
+                for (int a = 0; a < abjadTable.getRowCount(); a++) {
+                    StringBuilder z = new StringBuilder("");
+                    for (int b = 1; b < abjadTable.getColumnCount(); b++) {
+                        String q = (abjadTable.getValueAt(a, b) + "").trim() + " ";
+                        z.append(q);
+                    }
+                    phonemes.put(abjadTable.getValueAt(a, 0), z);
+                }
+                ws.put("Phonemes", phonemes);
+                if (!abjadFontField.getText().contains("LCS-ConstructorII")) {
+                    ws.put("Font", abjadFontField.getText());
+                    ws.put("FontType", "custom");
+                } else {
+                    ws.put("Font", "LCS-ConstructorII");
+                    ws.put("FontType", "borrowed");
+                }
+                ws.put("VowelsShown", true);
+            } else if (writeSyst.equals("Abugida")) {
+                ws.put("System", "Abugida");
+                ws.put("GlyphsPerLetter", 1);
+                ws.put("NumberOfLetters", abugidaTable.getRowCount());
+                for (int a = 0; a < abugidaTable.getRowCount(); a++) {
+                    StringBuilder z = new StringBuilder("");
+                    for (int b = 1; b < abugidaTable.getColumnCount(); b++) {
+                        String q = abugidaTable.getValueAt(a, b) + "";
+                        z.append(q);
+                    }
+                    phonemes.put(abugidaTable.getValueAt(a, 0), z);
+                }
+                ws.put("Phonemes", phonemes);
+                if (!abugidaFontField.getText().contains("LCS-ConstructorII")) {
+                    ws.put("Font", abugidaFontField.getText());
+                    ws.put("FontType", "custom");
+                } else {
+                    ws.put("Font", "LCS-ConstructorII");
+                    ws.put("FontType", "borrowed");
+                }
+            } else if (writeSyst.equals("Syllabary")) {
+                if (syllabaryCustomFontCheck.isSelected()) {
+                    ws.put("Font", syllabaryCustomFontField.getText());
+                } else {
+                    ws.put("Font", "LCS-ConstructorII");
+                }
+                ws.put("System", "Syllabary");
+                ws.put("NumberOfSyllables", syllabaryTable.getRowCount() * (syllabaryTable.getColumnCount() - 1));
+                HashMap syllables = new HashMap();
+                for (int a = 0; a < syllabaryTable.getRowCount(); a++) {
+                    for (int b = 1; b < syllabaryTable.getColumnCount(); b++) {
+                        String syllable = syllabaryTable.getValueAt(a, 0) + ""
+                                + syllabaryTable.getColumnName(b);
+                        syllables.put(syllable, syllabaryTable.getValueAt(a, b));
+                    }
+                }
+                ws.put("Syllables", syllables);
+                if (syllabaryCustomFontCheck.isSelected()) {
+                    ws.put("FontType", "custom");
+                    ws.put("Font", syllabaryCustomFontField.getText());
+                } else {
+                    ws.put("FontType", "borrowed");
+                }
+            } else if (writeSyst.equals("Multigraphic")) {
+                ws.put("System", "Multigraphic");
+                ws.put("GraphemesPerGlyph", graphemesPerGlyphSpinner.getValue());
+                ws.put("Font", multiCustomFontField.getText());
+                if (multiBorrowedRadio.isSelected()) {
+                    ws.put("FontType", "Borrowed");
+                } else {
+                    ws.put("FontType", "Custom");
+                }
+                ws.put("NumberOfLetters", multigraphicTable.getRowCount());
+                for (int a = 0; a < multigraphicTable.getRowCount(); a++) {
+                    StringBuilder z = new StringBuilder("");
+                    for (int b = 1; b < multigraphicTable.getColumnCount(); b++) {
+                        String q = multigraphicTable.getValueAt(a, b) + " ";
+                        z.append(q);
+                    }
+                    phonemes.put(multigraphicTable.getValueAt(a, 0), z);
+                }
+                ws.put("Phonemes", phonemes);
+            }
+            //if (punctuationSet){
+            HashMap punct = new HashMap();
+            for (int p = 0; p < punctuationTable.getRowCount(); p++) {
+                punct.put(punctuationTable.getValueAt(p, 0) + "",
+                        punctuationTable.getValueAt(p, 1) + "");
+                // }
+                ws.put("Punctuation", punct);
+            }
+            return ws;
+        }
+    }
+
+    public void setWritingSystem(java.util.HashMap ws) {
         writingSystem = ws;
     }
 
-    public int getChosenOption(){
+    public int getChosenOption() {
         return chosenOption;
     }
 
     /**
-    * @param args the command line arguments
-    */
+     * @param args the command line arguments
+     */
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
+
             public void run() {
                 RwWritingSystemChooser dialog = new RwWritingSystemChooser(new javax.swing.JFrame(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);
                     }
@@ -3890,7 +4526,6 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
             }
         });
     }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel Presets;
     private javax.swing.JScrollPane PresetsScroller;
@@ -3952,6 +4587,7 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
     private javax.swing.JButton autofillAlphabetButton;
     private javax.swing.JRadioButton borrowedAbjadFontRadio;
     private javax.swing.JRadioButton borrowedCharsRadio;
+    private javax.swing.JButton browse4WsButton;
     private javax.swing.JButton cancelButton;
     private javax.swing.JComboBox capitalizationCombo;
     private javax.swing.JLabel capitalizationLabel;
@@ -3985,6 +4621,7 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JTextField jumpToField;
     private javax.swing.JLabel jumpToLabel;
+    private javax.swing.JButton loadWsButton;
     private javax.swing.ButtonGroup mainButtonGroup;
     private javax.swing.JButton multiAutoFillButton;
     private javax.swing.JRadioButton multiBorrowedRadio;
@@ -4031,6 +4668,7 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
     private javax.swing.JPanel punctuationCard;
     private javax.swing.JScrollPane punctuationScroller;
     private javax.swing.JTable punctuationTable;
+    private javax.swing.JButton saveWsButton;
     private javax.swing.JButton setAbjadCharButton;
     private javax.swing.JButton setAbugidaCharButton;
     private javax.swing.JButton setAlphaCharButton;
@@ -4057,6 +4695,9 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
     private javax.swing.JButton upPageAbugidaButton;
     private javax.swing.JButton upPageButton;
     private javax.swing.JButton useSystemButton;
+    private javax.swing.JPanel userDefdCard;
+    private javax.swing.JScrollPane userDefdScroller;
+    private javax.swing.JTable userDefdTable;
     private javax.swing.JLabel visibleCharLabel;
     private javax.swing.JCheckBox vowelCarrierCheck;
     private javax.swing.JComboBox vowelNumCombo;
@@ -4069,4 +4710,8 @@ public class RwWritingSystemChooser extends javax.swing.JDialog {
     public int OK_OPTION = 1;
     public int CANCEL_OPTION = 0;
     public boolean punctuationSet = false;
+    public boolean wsLoaded = false;
+    private Vector vows;
+    private Vector cons;
+    private File wsFile;
 }

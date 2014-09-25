@@ -177,10 +177,12 @@ public class RwDictionaryEntry {
                     numberOfSyllables = 2;
                 }
             }
-            if (f > 100 && f < 1000){
-                numberOfSyllables -= 1;
-                if(numberOfSyllables < 3){
-                    numberOfSyllables = 3;
+            if (maxSylls >=3){
+                if (f > 100 && f < 1000){
+                    numberOfSyllables -= 1;
+                    if(numberOfSyllables < 3){
+                        numberOfSyllables = 3;
+                    }
                 }
             }
             //int numberOfSyllables=(int)(Math.random()*maxSylls)+1;

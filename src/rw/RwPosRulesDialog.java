@@ -31,6 +31,7 @@ public class RwPosRulesDialog extends javax.swing.JDialog {
     /** Creates new form RwPosRulesDialog */
     public RwPosRulesDialog(java.awt.Frame parent, boolean modal, HashMap rules) {
         super(parent, modal);
+        setTitle("Set Part of Speech Rules");
         initComponents();
         setLocationRelativeTo(parent);
         String[] pos ={"Adjective",
