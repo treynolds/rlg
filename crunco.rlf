@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Project>
+<Vowels><![CDATA[61,65,69,6f,75]]></Vowels>
+<Consonants><![CDATA[62,63,64,66,67,68,6a,6b,6c,6d,6e,70,71,72,73,74,76,77,78,79,7a]]></Consonants>
+<SyllablePatterns><![CDATA[CV 0]]></SyllablePatterns>
+<Rules>
+<Rule><![CDATA[Adjective: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[Adverb: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[Article: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[Comp Adjective: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[Comp Adverb: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[Conjunction: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[Determiner: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[Interjection: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[List: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[Modal: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[Noun: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[Noun Plural: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[Noun Plural Proper: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[Noun Proper: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[Number: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[Particle: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[Possesive: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[Pos Pronoun: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[Predeterminer: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[Preposition: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[Pers Pronoun: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[Pronoun: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[Super Adjective: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[Super Adverb: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[Symbol: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[There: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[To: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[Verb: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[Verb 3 pers: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[Verb non 3 pers: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[Verb Past: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[Verb Past Part: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[Verb Gerund: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[Wh Adverb: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[Wh Determiner: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[Wh Pronoun: [false, , 0, false, true]]]></Rule>
+<Rule><![CDATA[Pos Wh Pronoun: [false, , 0, false, true]]]></Rule>
+</Rules>
+<WritingSystem>
+<System>Alphabet</System>
+<FontType>borrowed</FontType>
+<Font>LCS-ConstructorII</Font>
+<NumberOfLetters>26</NumberOfLetters>
+<GlyphsPerLetter>2</GlyphsPerLetter>
+<GlyphUseMap>
+<Glyph_1>Upper</Glyph_1>
+<Glyph_2>Lower</Glyph_2>
+</GlyphUseMap>
+<CapRule>Sentence</CapRule>
+<Phonemes>
+<Phoneme>
+<pkey><![CDATA[Zg==]]></pkey>
+<pvalue><![CDATA[F3B08D8620F3B08DA620]]></pvalue>
+</Phoneme>
+<Phoneme>
+<pkey><![CDATA[Zw==]]></pkey>
+<pvalue><![CDATA[F3B08D8720F3B08DA720]]></pvalue>
+</Phoneme>
+<Phoneme>
+<pkey><![CDATA[ZA==]]></pkey>
+<pvalue><![CDATA[F3B08D8420F3B08DA420]]></pvalue>
+</Phoneme>
+<Phoneme>
+<pkey><![CDATA[ZQ==]]></pkey>
+<pvalue><![CDATA[F3B08D8520F3B08DA520]]></pvalue>
+</Phoneme>
+<Phoneme>
+<pkey><![CDATA[Yg==]]></pkey>
+<pvalue><![CDATA[F3B08D8220F3B08DA220]]></pvalue>
+</Phoneme>
+<Phoneme>
+<pkey><![CDATA[Yw==]]></pkey>
+<pvalue><![CDATA[F3B08D8320F3B08DA320]]></pvalue>
+</Phoneme>
+<Phoneme>
+<pkey><![CDATA[YQ==]]></pkey>
+<pvalue><![CDATA[F3B08D8120F3B08DA120]]></pvalue>
+</Phoneme>
+<Phoneme>
+<pkey><![CDATA[bg==]]></pkey>
+<pvalue><![CDATA[F3B08D8E20F3B08DAE20]]></pvalue>
+</Phoneme>
+<Phoneme>
+<pkey><![CDATA[bw==]]></pkey>
+<pvalue><![CDATA[F3B08D8F20F3B08DAF20]]></pvalue>
+</Phoneme>
+<Phoneme>
+<pkey><![CDATA[bA==]]></pkey>
+<pvalue><![CDATA[F3B08D8C20F3B08DAC20]]></pvalue>
+</Phoneme>
+<Phoneme>
+<pkey><![CDATA[bQ==]]></pkey>
+<pvalue><![CDATA[F3B08D8D20F3B08DAD20]]></pvalue>
+</Phoneme>
+<Phoneme>
+<pkey><![CDATA[ag==]]></pkey>
+<pvalue><![CDATA[F3B08D8A20F3B08DAA20]]></pvalue>
+</Phoneme>
+<Phoneme>
+<pkey><![CDATA[aw==]]></pkey>
+<pvalue><![CDATA[F3B08D8B20F3B08DAB20]]></pvalue>
+</Phoneme>
+<Phoneme>
+<pkey><![CDATA[aA==]]></pkey>
+<pvalue><![CDATA[F3B08D8820F3B08DA820]]></pvalue>
+</Phoneme>
+<Phoneme>
+<pkey><![CDATA[aQ==]]></pkey>
+<pvalue><![CDATA[F3B08D8920F3B08DA920]]></pvalue>
+</Phoneme>
+<Phoneme>
+<pkey><![CDATA[dw==]]></pkey>
+<pvalue><![CDATA[F3B08D9720F3B08DB720]]></pvalue>
+</Phoneme>
+<Phoneme>
+<pkey><![CDATA[dg==]]></pkey>
+<pvalue><![CDATA[F3B08D9620F3B08DB620]]></pvalue>
+</Phoneme>
+<Phoneme>
+<pkey><![CDATA[dQ==]]></pkey>
+<pvalue><![CDATA[F3B08D9520F3B08DB520]]></pvalue>
+</Phoneme>
+<Phoneme>
+<pkey><![CDATA[dA==]]></pkey>
+<pvalue><![CDATA[F3B08D9420F3B08DB420]]></pvalue>
+</Phoneme>
+<Phoneme>
+<pkey><![CDATA[cw==]]></pkey>
+<pvalue><![CDATA[F3B08D9320F3B08DB320]]></pvalue>
+</Phoneme>
+<Phoneme>
+<pkey><![CDATA[cg==]]></pkey>
+<pvalue><![CDATA[F3B08D9220F3B08DB220]]></pvalue>
+</Phoneme>
+<Phoneme>
+<pkey><![CDATA[cQ==]]></pkey>
+<pvalue><![CDATA[F3B08D9120F3B08DB120]]></pvalue>
+</Phoneme>
+<Phoneme>
+<pkey><![CDATA[cA==]]></pkey>
+<pvalue><![CDATA[F3B08D9020F3B08DB020]]></pvalue>
+</Phoneme>
+<Phoneme>
+<pkey><![CDATA[eg==]]></pkey>
+<pvalue><![CDATA[F3B08D9A20F3B08DBA20]]></pvalue>
+</Phoneme>
+<Phoneme>
+<pkey><![CDATA[eQ==]]></pkey>
+<pvalue><![CDATA[F3B08D9920F3B08DB920]]></pvalue>
+</Phoneme>
+<Phoneme>
+<pkey><![CDATA[eA==]]></pkey>
+<pvalue><![CDATA[F3B08D9820F3B08DB820]]></pvalue>
+</Phoneme>
+</Phonemes>
+<Punctuation><![CDATA[40e40, 5De5D, 5Ce5C, 5Fe5F, 5Ee5E, 5Be5B, 22e22, 23e23, 20e20, 21e21, 26e26, 27e27, 60e60, 24e24, 25e25, 2Ae2A, 2Be2B, 28e28, 29e29, 2Ee2E, 2Fe2F, 2Ce2C, 2De2D, 33e33, 32e32, 31e31, 30e30, 37e37, 36e36, 35e35, 34e34, 3Be3B, 7Ee7E, 3Ae3A, 7De7D, 39e39, 7Ce7C, 38e38, 7Be7B, 3Fe3F, 3Ee3E, 3De3D, 3Ce3C]]></Punctuation>
+</WritingSystem>
+<Dictionary>
+<DictionaryEntry><![CDATA[YWJhbmRvbjogd2FydXNlYnUsIFZlcmIsIHIsIDIsIDVCMzAyQzIwMzIyQzIwMzQyQzIwMzY1RCwg87CNt/OwjaHzsI2y87CNtfOwjbPzsI2l87CNovOwjbUsIHh4eCwgMCwg]]></DictionaryEntry>
+<DictionaryEntry><![CDATA[YW5kOiBjZXJvaGl3dSwgQ29uanVuY3Rpb24sIHIsIDIsIDVCMzAyQzIwMzIyQzIwMzQyQzIwMzY1RCwg87CNo/OwjaXzsI2y87CNr/OwjajzsI2p87CNt/OwjbUsIHh4eCwgMCwg]]></DictionaryEntry>
+<DictionaryEntry><![CDATA[YXBwbGU6IGZpcGFrdXlpLCBOb3VuLCByLCAyLCA1QjMwMkMyMDMyMkMyMDM0MkMyMDM2NUQsIPOwjabzsI2p87CNsPOwjaHzsI2r87CNtfOwjbnzsI2pLCB4eHgsIDAsIA==]]></DictionaryEntry>
+<DictionaryEntry><![CDATA[YXJvdW5kOiBzaW1hdGVxbywgUHJlcG9zaXRpb24sIHIsIDIsIDVCMzAyQzIwMzIyQzIwMzQyQzIwMzY1RCwg87CNs/OwjanzsI2t87CNofOwjbTzsI2l87CNsfOwja8sIHh4eCwgMCwg]]></DictionaryEntry>
+<DictionaryEntry><![CDATA[YmVnOiBxdWdlc2ljbywgVmVyYiwgciwgMiwgNUIzMDJDMjAzMjJDMjAzNDJDMjAzNjVELCDzsI2x87CNtfOwjafzsI2l87CNs/OwjanzsI2j87CNrywgeHh4LCAwLCA=]]></DictionaryEntry>
+<DictionaryEntry><![CDATA[YmVnZ2FyOiBzZW5vdmFrYSwgTm91biwgYmVnLCAyLCA1QjMwMkMyMDMyMkMyMDM0MkMyMDM2NUQsIPOwjbPzsI2l87CNrvOwja/zsI2287CNofOwjavzsI2hLCB4eHgsIDAsIA==]]></DictionaryEntry>
+<DictionaryEntry><![CDATA[YmVnZ2VkOiBnZXRlem9jdSwgVmVyYiwgYmVnLCAyLCA1QjMwMkMyMDMyMkMyMDM0MkMyMDM2NUQsIPOwjafzsI2l87CNtPOwjaXzsI2687CNr/OwjaPzsI21LCB4eHgsIDAsIA==]]></DictionaryEntry>
+<DictionaryEntry><![CDATA[Y2FydDogdm94ZWRvaG8sIE5vdW4sIHIsIDIsIDVCMzAyQzIwMzIyQzIwMzQyQzIwMzY1RCwg87CNtvOwja/zsI2487CNpfOwjaTzsI2v87CNqPOwja8sIHh4eCwgMCwg]]></DictionaryEntry>
+<DictionaryEntry><![CDATA[Y2FydDogaHVsdXBla28sIFZlcmIsIGNhcnQsIDIsIDVCMzAyQzIwMzIyQzIwMzQyQzIwMzY1RCwg87CNqPOwjbXzsI2s87CNtfOwjbDzsI2l87CNq/Owja8sIHh4eCwgMCwg]]></DictionaryEntry>
+<DictionaryEntry><![CDATA[Y2FydGVkOiB4aWpvYnVobywgVmVyYiwgY2FydCwgMiwgNUIzMDJDMjAzMjJDMjAzNDJDMjAzNjVELCDzsI2487CNqfOwjarzsI2v87CNovOwjbXzsI2o87CNrywgeHh4LCAwLCA=]]></DictionaryEntry>
+<DictionaryEntry><![CDATA[ZGlydDogcW9yYXJ1bmUsIE5vdW4sIHIsIDIsIDVCMzAyQzIwMzIyQzIwMzQyQzIwMzY1RCwg87CNsfOwja/zsI2y87CNofOwjbLzsI2187CNrvOwjaUsIHh4eCwgMCwg]]></DictionaryEntry>
+<DictionaryEntry><![CDATA[ZGlydHk6IGdhc3VkYXFlLCBBZGplY3RpdmUsIGRpcnQsIDIsIDVCMzAyQzIwMzIyQzIwMzQyQzIwMzY1RCwg87CNp/OwjaHzsI2z87CNtfOwjaTzsI2h87CNsfOwjaUsIHh4eCwgMCwg]]></DictionaryEntry>
+<DictionaryEntry><![CDATA[ZmxhdDogcWlnZWRhaHUsIEFkamVjdGl2ZSwgciwgMiwgNUIzMDJDMjAzMjJDMjAzNDJDMjAzNjVELCDzsI2x87CNqfOwjafzsI2l87CNpPOwjaHzsI2o87CNtSwgeHh4LCAwLCA=]]></DictionaryEntry>
+<DictionaryEntry><![CDATA[ZmxhdGx5OiB0ZWxhcmFuYSwgQWR2ZXJiLCBmbGF0LCAyLCA1QjMwMkMyMDMyMkMyMDM0MkMyMDM2NUQsIPOwjbTzsI2l87CNrPOwjaHzsI2y87CNofOwja7zsI2hLCB4eHgsIDAsIA==]]></DictionaryEntry>
+<DictionaryEntry><![CDATA[ZmxhdHRlbjogdmVzYWR1cWUsIFZlcmIsIGZsYXQsIDIsIDVCMzAyQzIwMzIyQzIwMzQyQzIwMzY1RCwg87CNtvOwjaXzsI2z87CNofOwjaTzsI2187CNsfOwjaUsIHh4eCwgMCwg]]></DictionaryEntry>
+<DictionaryEntry><![CDATA[ZmxhdHRlcjogY2lnb3Z1a2ksIEFkamVjdGl2ZSwgZmxhdCwgMiwgNUIzMDJDMjAzMjJDMjAzNDJDMjAzNjVELCDzsI2j87CNqfOwjafzsI2v87CNtvOwjbXzsI2r87CNqSwgeHh4LCAwLCA=]]></DictionaryEntry>
+<DictionaryEntry><![CDATA[ZmxhdHRlcjogcWlmdXp1dHUsIFZlcmIsIHIsIDIsIDVCMzAyQzIwMzIyQzIwMzQyQzIwMzY1RCwg87CNsfOwjanzsI2m87CNtfOwjbrzsI2187CNtPOwjbUsIHh4eCwgMCwg]]></DictionaryEntry>
+<DictionaryEntry><![CDATA[ZmxhdHRlcmluZzogc29xYXFhcGEsIFZlcmIsIGZsYXR0ZXIsIDIsIDVCMzAyQzIwMzIyQzIwMzQyQzIwMzY1RCwg87CNs/Owja/zsI2x87CNofOwjbHzsI2h87CNsPOwjaEsIHh4eCwgMCwg]]></DictionaryEntry>
+<DictionaryEntry><![CDATA[ZmxhdHRlcmluZzogZ2FiYXRlaGksIE5vdW4sIGZsYXR0ZXIsIDIsIDVCMzAyQzIwMzIyQzIwMzQyQzIwMzY1RCwg87CNp/OwjaHzsI2i87CNofOwjbTzsI2l87CNqPOwjaksIHh4eCwgMCwg]]></DictionaryEntry>
+<DictionaryEntry><![CDATA[ZmxhdHRlcmluZzogeHV4aWZpbGksIEFkamVjdGl2ZSwgZmxhdHRlciwgMiwgNUIzMDJDMjAzMjJDMjAzNDJDMjAzNjVELCDzsI2487CNtfOwjbjzsI2p87CNpvOwjanzsI2s87CNqSwgeHh4LCAwLCA=]]></DictionaryEntry>
+<DictionaryEntry><![CDATA[aGU6IGhlc2FuaWxhLCBQcm9ub3VuLCByLCAyLCA1QjMwMkMyMDMyMkMyMDM0MkMyMDM2NUQsIPOwjajzsI2l87CNs/OwjaHzsI2u87CNqfOwjazzsI2hLCB4eHgsIDAsIA==]]></DictionaryEntry>
+<DictionaryEntry><![CDATA[b2g6IHdlbmVjZXB1LCBJbnRlcmplY3Rpb24sIHIsIDIsIDVCMzAyQzIwMzIyQzIwMzQyQzIwMzY1RCwg87CNt/OwjaXzsI2u87CNpfOwjaPzsI2l87CNsPOwjbUsIHh4eCwgMCwg]]></DictionaryEntry>
+<DictionaryEntry><![CDATA[dGhlOiBjdXFlY3VyaSwgQXJ0aWNsZSwgciwgMiwgNUIzMDJDMjAzMjJDMjAzNDJDMjAzNjVELCDzsI2j87CNtfOwjbHzsI2l87CNo/OwjbXzsI2y87CNqSwgeHh4LCAwLCA=]]></DictionaryEntry>
+</Dictionary>
+</Project>
