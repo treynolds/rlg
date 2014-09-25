@@ -22,9 +22,7 @@ import javax.xml.transform.stream.*;
 import javax.xml.transform.sax.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import javax.swing.event.UndoableEditEvent;
-import javax.swing.event.UndoableEditListener;
-import javax.swing.undo.CannotRedoException;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.undo.UndoManager;
 
 /*
@@ -644,6 +642,8 @@ public class RandomWords extends javax.swing.JFrame {
 
     private void loadDefinitionsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadDefinitionsButtonActionPerformed
         final JFileChooser jfc = new JFileChooser(".");
+        FileNameExtensionFilter fnef = new FileNameExtensionFilter("Random Languange Generator Dictionary Files", "rdf");
+        jfc.setFileFilter(fnef);
         int chosenOption = jfc.showOpenDialog(rootPane);
         if (chosenOption != jfc.CANCEL_OPTION) {
             final RwProgressPane pgp = new RwProgressPane(this, false, false);
@@ -653,7 +653,7 @@ public class RandomWords extends javax.swing.JFrame {
                     Integer finished = new Integer(0);
                     File definitions = jfc.getSelectedFile();
                     definitionsName = definitions.getName();
-                    if (definitionsName.endsWith(".csv")) {
+                    if (definitionsName.endsWith(".rdf")) {
                         definitionsName = definitionsName.substring(0,
                                 definitionsName.length() - 4);
                     }
@@ -867,6 +867,8 @@ public class RandomWords extends javax.swing.JFrame {
         wordCount = 0;
         dictionary.clear();
         final JFileChooser jfc = new JFileChooser(".");
+        FileNameExtensionFilter fnef = new FileNameExtensionFilter("Random Languange Generator Language files", "rlf");
+        jfc.setFileFilter(fnef);
         int chosenOption = jfc.showOpenDialog(this);
         if (chosenOption != jfc.CANCEL_OPTION) {
             final RwProgressPane pgp = new RwProgressPane(this, false, true);
@@ -1485,10 +1487,12 @@ public class RandomWords extends javax.swing.JFrame {
 
     private void saveAsItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveAsItemActionPerformed
         JFileChooser jfc = new JFileChooser(".");
+        FileNameExtensionFilter fnef = new FileNameExtensionFilter("Random Languange Generator Language Files", "rlf");
+        jfc.addChoosableFileFilter(fnef);
         int chosenOption = jfc.showSaveDialog(this);
         if (chosenOption != JFileChooser.CANCEL_OPTION) {
             projectName = jfc.getSelectedFile().getPath();
-            if (projectName.endsWith(".xml")) {
+            if (projectName.endsWith(".rlf")) {
                 projectName = projectName.substring(0, projectName.length() - 4);
                 setTitle("Random Language Generator " + jfc.getSelectedFile().getName());
                 saveItemActionPerformed(evt);
@@ -1517,11 +1521,13 @@ public class RandomWords extends javax.swing.JFrame {
 
     private void saveDefinitionsAsItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveDefinitionsAsItemActionPerformed
         JFileChooser jfc = new JFileChooser(".");
+        FileNameExtensionFilter fnef = new FileNameExtensionFilter("Random Languange Generator Dictionary Files", "rdf");
+        jfc.addChoosableFileFilter(fnef);
         int chosenOption = jfc.showSaveDialog(this);
         if (chosenOption != JFileChooser.CANCEL_OPTION) {
             File defs = jfc.getSelectedFile();
             definitionsName = defs.getPath();
-            if (definitionsName.endsWith(".csv")) {
+            if (definitionsName.endsWith(".rdf")) {
                 definitionsName = definitionsName.substring(0,
                         definitionsName.length() - 4);
             }
